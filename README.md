@@ -1,1 +1,1 @@
-# Crystal-Plasticity-COE-Journal
+# Crystal-Plasticity-COE-Course

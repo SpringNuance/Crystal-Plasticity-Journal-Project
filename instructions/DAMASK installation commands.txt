@@ -1,0 +1,174 @@
+################################
+# Spack and petsc installation #
+################################
+
+# First, go to the projappl directory. Projappl on CSC is a scratch disk dedicated to software installation
+# Installing on scratch disk is not recommended as CSC may delete it once in a while
+cd /projappl/project_2004956
+
+# Create spark folder
+mkdir spack
+cd spack
+
+# Purging all existing modules and setting the USER_SPACK_ROOT variable
+module --force purge
+export USER_SPACK_ROOT=/projappl/project_2004956/spack
+
+# Initiating petsc scientific library. Commands different for puhti and mahti servers
+# If these no longer succeeds, please contact CSC staff
+module load spack/v0.18-user (puhti)
+module load spack/v0.17-user (mahti)
+
+# Finally, initiate the spack
+user-spack-init
+
+# Installing petsc. Commands different for puhti and mahti servers
+# If these no longer succeeds, please contact CSC staff
+spack install petsc@3.16.3+fftw+hdf5 (puhti)
+spack install -v --reuse --fail-fast petsc@3.16.1+fftw+hdf5 (mahti)
+
+# Installation takes about 5-10 minutes. You hopefully end up with few folders in the spack folder. One of those is named "install_tree".  
+# The shared library directory can be something like this 
+/projappl/project_2004956/spack/install_tree/gcc-11.2.0/petsc-3.16.1-zeqfqr/lib
+
+#####################################
+# DAMASK version 2.0.3 installation #
+#####################################
+
+# Go to projappl directory
+cd /projappl/project_2004956
+
+# Create damask2 software folder
+mkdir damask2
+cd damask2
+
+# Download the tar file from DAMASK 2 website and unzip it
+wget https://damask2.mpie.de/pub/Download/Current/damask-2.0.3.tar.xz
+tar -xJvf damask-2.0.3.tar.xz
+
+Then at this point, copy the damask_env.txt from Binh's directory to the current directory of damask2
+If it is deleted, you can also find damask_env.txt from damask2 folder on the repository
+cp /scratch/project_2004956/Binh/damask_env.txt .
+
+and replace the petsc and damask installation root directory in the damask_env.txt file accordingly
+
+# Activating the CSC virtual environment
+. damask_env.txt
+
+# Activate the DAMASK virtual environment 
+. damask-2.0.3/env/DAMASK.sh
+
+# Because damask 2.0.3 installation requires petsc version of 3.10.x, to ignore this problem, we need to modify the 
+Fortran compiler file. 
+
+emacs damask-2.0.3/src/DAMASK_interface.f90
+
+# Comment out lines 95-105 for damask-2.0.3. Comment out the lines by the exclamation mark "!"
+# After commenting the lines, please save and exit from the emacs txt editor
+Save: ctrl + X
+Exit: ctrl + C
+
+# Finally, install the spectral solver 
+cd damask-2.0.3
+make spectral
+
+# Due to Python legacies, you should also manually fix some files as follows:
+
+open the directory /projappl/project_2004956/damask2/damask-2.0.3/python/damask/test
+then open the file test.py 
+and edit the import line
+"from collections import Iterable"
+to 
+"from collections.abc import Iterable"
+because latest python version no longer supports this collections library. 
+
+do the same for file asciitable.py at /scratch/project_2004956/damask-2.0.3/damask-2.0.3/python/damask
+to be fast, you can delete this asciitable.py file
+then copy asciitable.py at /scratch/project_2004956/Binh and paste inside this directory
+If it is deleted, you can also find asciitable.py from damask2 folder on the repository
+
+next, open the directory /scratch/project_2004956/damask-2.0.3/damask-2.0.3/python/damask/solver
+then open the file marc.py and scroll to the bottom, replace "is not" with "!="
+
+if (string.find(line,'tress iteration') != -1):
+        print(line)
+      elif (string.find(line,'Exit number') != -1):
+        substr = line[string.find(line,'Exit number'):len(line)]
+        exitnumber = int(substr[12:16])
+
+# Finally, you can also make processing tools, but it is not necessary
+make processing
+
+###########################################
+# DAMASK version 3 alpha 6.0 installation #
+###########################################
+
+# Going to the projappl directory and create damask3 installation folder
+cd /projappl/project_2004956
+mkdir damask3
+cd damask3
+
+# Download damask3 from the website and untar the file
+wget https://damask.mpie.de/download/damask-3.0.0-alpha6.tar.xz
+wget https://damask.mpie.de/download/damask-3.0.0-alpha6.tar.xz.sha256
+sha256sum -c damask-3.0.0-alpha6.tar.xz.sha256 && tar -xf damask-3.0.0-alpha6.tar.xz
+
+# copy the env file like in damask2 above
+cp /scratch/project_2004956/damask_env.txt .  
+
+and replace the petsc and damask installation root directory in the damask_env.txt file accordingly
+
+# Activating the CSC virtual environment
+. damask_env.txt
+
+# Building the grid solver
+cmake -S damask-3.0.0-alpha6 -B build-grid -DDAMASK_SOLVER=grid -DCMAKE_INSTALL_PREFIX=/projappl/project_2004956/damask3/grid_solver
+cmake --build build-grid --target install
+
+# Building the mesh solver
+cmake -S damask-3.0.0-alpha6 -B build-mesh -DDAMASK_SOLVER=mesh -DCMAKE_INSTALL_PREFIX=/projappl/project_2004956/damask3/mesh_solver
+cmake --build build-mesh --target install
+
+# After this you can find the solvers in the directory /projappl/project_2004956/damask3/grid_solver/bin and /projappl/project_2004956/damask3/mesh_solver/bin
+
+
+
+ 
+### Some notes from Esko (CSC) about srun
+Without knowing anything about the application or the software, I compiled version 2.0.3 of DAMASK on Puhti RHEL8 and ran some examples.
+
+You may test how the throughput time becomes shorter as increasing the number of mpi processes (cores).  
+The manual says "the grid dimension along z has to be an integer multiple of the intended number of nodes to be used".  
+Remember that one node on the Puhti servers has 40 cores. 
+For example if you have geometry 64x64x64 you may increase the number of core up to 32 (64  % 32 = 0), which fits in a one node, like 
+
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=32
+
+srun -n 32 DAMASK_spectral ........  etc
+
+or,
+
+srun -n $SLURM_TASKS_PER_NODE  DAMASK_spectral ...... etc
+
+If you have even large geometry, like 128x128x128, you may run on Puhti with two nodes:
+
+#SBATCH --nodes=2
+#SBATCH --ntasks=64
+#SBATCH --ntasks-per-node=32
+
+srun -n $SLURM_NTASKS DAMASK_spectral --load ..... etc
+
+
+
+### Some notes from Rasmus (CSC) about hyperqueue
+Hi Binh,
+
+I found the issue. To get the workflow running, the number of cores on each node should be divisible by the amount you intend to run each subtask with. This is not the case for DAMASK_NUM_THREADS=16, since 40/16 is not an integer.
+
+And why is this an issue? Because then some tasks would need to get cores from multiple nodes, which would require MPI. However with hq we cannot use MPI out of the box.
+
+So to get the example case of 5 tasks to run, you could define --nodes=1 and DAMASK_NUM_THREADS=8 (40/8=5 ok!)
+
+On puhti the maximum number of nodes you can request for a single job is 26 (26*40=1040 cores). So with DAMASK_NUM_THREADS=8 you would be able to run 130 tasks at the same time while with
+DAMASK_NUM_THREADS=2 you could do 520 at the same time and so on. On mahti you could request much more resources and get your calculations done even faster. But I understood from Esko that installing damask on Mahti is a bit tricky.

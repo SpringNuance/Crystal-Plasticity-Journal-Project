@@ -1,0 +1,41 @@
+There are many folders in the project code. Their overall purposes are:
+\\
+--- \textbf{damask2/damask3}: contains template generating ipynb files for DAMASK. In DAMASK 3 folder, users can generate necessary files for DAMASK simulations.
+\\
+--- \textbf{instructions}: documentations on software usage and damask installation
+\\
+--- \textbf{linux_slurm}: shell scripts for array or hyperqueue jobs on both puhti and mahti servers. They are run automatically for generating initial simulations and parameter calibration. This folder is not for running manually on scratch disk. 
+\\
+--- \textbf{log}: writes printed messages from running optimize.py into a txt log file so that users can keep track of the parallel optimization on the AWS EC2. This is because the screen terminal of EC2 Linux cannot be scrolled up to see the past results.
+\\
+--- \textbf{manualParams}: contains random initial simulation for running in smaller batches of 25 parameters $\times$ 7 loadings = 175 jobs per sbatch submission. 
+\\
+--- \textbf{modules}: contains four files: stoploss.py for the stop and loss functions, SIM.py for all simulation interactions with CSC (initial/iteration/parameter analysis simulations), preprocessing.py for processing the true stress-strain curves into plastic flow curves, and helper.py for helper functions used throughout the project. 
+\\
+--- \textbf{notebooks}: contains ipynb notebook files for testing features of GUI and parameter calibration. This folder also contains figures of parametric studies. 
+\\
+--- \textbf{optimizers}: contains the searching algorithms GA, BO, PSO, and the ANN. It also contains ANN.ipynb for conducting model architecture selection.
+\\ 
+--- \textbf{parameter_analysis}: runs multiple jobs on CSC for varying parameters for analysis, which is intended for the GUI parameter analysis tab.
+\\
+--- \textbf{results}: initial simulations and parameter calibration results are contained inside this folder. After success in any stage, users can drag this result folder from WinSCP into the project. Then, results can be visualized on the GUI web. 
+\\ 
+--- \textbf{simulations}: contains DAMASK simulations when the code runs on CSC. Users can safely delete this folder at any stage to make room for newer simulations because the scratch disk has a limited space of 1 tebibyte. The CSC server can interrupt the running code if the data storage exceeds the disk quota. 
+\\
+--- \textbf{targets}: contains the experimental, processed, and interpolated curves. It also contains parameter information, such as the parameter type, general ranges, targeted parameters for calibration, discrete step sizes, and default values.
+\\
+--- \textbf{templates}: contains DAMASK simulation templates for running simulations. This folder is not meant to be run manually, just like the linux\_slurm folder.
+\\ 
+--- \textbf{templates_projappl}: DAMASK templates that can run on any scratch disk using the common projappl folder on CSC. More information about disk areas \href{https://docs.csc.fi/computing/disk/}{here} 
+\\ 
+--- \textbf{templates_original\_puhti/mahti}: original DAMASK simulation templates written by the advisor. These templates are inefficient for their long running time.
+\\ 
+--- \textbf{templates_reduced\_puhti/mahti}: changed by the group leader from the advisor's original templates, where the increments and frequency are reduced in the tensionX.load file. These templates run much faster than the original ones.
+\\
+--- \textbf{model_analysis.py}: training ANN architecture over simulation data for model selection. Users can manually change this file for different ANN configurations. 
+\\ 
+--- \textbf{optimize_config.xlsx}: excel file that contains all parameter optimization configurations. Users can edit according to their needs for parameter calibration.
+\\
+--- \textbf{optimize_config.py}: obtaining parameter calibration configurations from the optimize\_config.xlsx and process all necessary information. Three files jointly use this file: optimize.py, model\_analysis.py, and parameter\_analysis.py. 
+\\ 
+--- \textbf{optimize.py}: this is the central file in this project. It automates the whole parameter calibration process from start to finish. The tasks included are generating initial simulations, processing the curves, obtaining the parameter information, training the ANN, calculating the default parameters, running DAMASK simulations during the four optimization stages, logging the calibration process details, and saving the results. The only things users can change in this file are the ANN model configurations and the index of the initial guessing parameters from manualParams for running initial simulations in smaller batches. 

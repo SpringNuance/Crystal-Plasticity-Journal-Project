@@ -1,0 +1,100 @@
+####################
+# WinSCP and PuTTy #
+####################
+
+Remember to install these two programs before running the project code on CSC
+WinSCP: https://winscp.net/eng/index.php
+PuTTy: https://www.putty.org
+
+Log in CSC on both WinSCP and PuTTy with 
+<username>@puhti.csc.fi
+<username>@mahti.csc.fi 
+<your CSC password>
+
+############################################
+# Basic CSC operations (Manual submission) #
+############################################
+
+cd <working directory>
+Running preprocessing: sbatch subFFTCSCpre.sh 
+Running postprocessing: sbatch subFFTCSCpost.sh
+Checking the queue: squeue --me
+Cancel sbatch jobs: scancel <jobid>  
+
+###################################################################
+# No AWS screen (running the project code directly on CSC server) #
+###################################################################
+
+# First, drag the project code onto a working directory on CSC server by WinSCP
+
+# On PuTTy, log into your CSC account
+<username>@mahti.csc.fi (mahti)
+<username>@puhti.csc.fi (puhti)
+
+# Install all libraries (do this only once per user for a server)
+pip install --user -r requirements.txt
+
+# Install one library (do this only once per user for a server)
+pip install --user prettytable
+
+# Running the project code
+cd <working directory>
+example: cd /scratch/project_2004956/Binh/COE_PH_GA_discrete
+
+# Loading the python module of CSC
+module load python-data
+
+# Running the file
+python optimize.py
+
+To interrupt Python running, press Ctrl + C or just close the terminal
+
+#########################################################################################
+# AWS screen (running the project code from AWS EC2 Linux and remote connection to CSC) #
+#########################################################################################
+
+# First, drag the project code onto a working directory on CSC server by WinSCP
+
+# How to setup AWC EC2 instance
+https://www.youtube.com/watch?v=BYvKv3kM9pk&t=447s
+
+# After the setup, log into the AWS EC2 linux on PuTTy
+
+# On AWS EC2 PuTTy, starting a new screen and ssh connect to CSC server
+screen
+ssh <username>@mahti.csc.fi (mahti)
+ssh <username>@puhti.csc.fi (puhti)
+<password>
+
+# Install all libraries (do this only once per user for a server)
+pip install --user -r requirements.txt
+
+# Install one library (do this only once per user for a server)
+pip install --user prettytable
+
+# Running the project code on AWS
+cd <working directory>
+example: cd /scratch/project_2004956/Binh/COE_PH_GA_discrete
+
+# Loading the python module of CSC
+module load python-data
+
+# Running the file
+python optimize.py
+
+To interrupt Python running, press Ctrl + C.
+You cannot quit the running code by closing the terminal when you use screen on AWS
+
+# You can quit the running terminal and resume it later. Resume a screen with 
+screen -r
+
+# If there are multiple screens, use screen -r for listing all current screen ids
+# Then resume screen id with 
+screen -r <screen-id>
+example: screen -r 154797.pts-0.ip-172-31-88-6
+
+# Note: you cannot resume already attached screens (a screen already opened in some terminal)
+
+# To quit a screen, use 
+screen -X -S <screen-id> quit
+example: screen -X -S 154797.pts-0.ip-172-31-88-6 quit

@@ -1,0 +1,17 @@
+module purge
+module load gcc/11.2.0
+module load openmpi/4.1.2
+module load hdf5/1.10.7-mpi
+module load fftw/3.3.10-mpi
+module load python-data/3.10-22.09
+
+export PETSC_DIR=/projappl/project_2004956/spack/install_tree/gcc-11.2.0/petsc-3.16.1-zeqfqr
+# An example: /scratch/project_xxyyzz/user/spack_user_petsc/install_tree/gcc-11.2.0/petsc-3.16.1-zeqfqr
+
+export DAMASK_ROOT=/projappl/project_2004956/damask3/damask-3.0.0-alpha6
+# An example /scratch/project_xxyyzz/user/damask-2/damask-2.0.3
+
+export PETSC_FC_INCLUDES=$PETSC_DIR/include
+export LD_LIBRARY_PATH=$PETSC_DIR/lib:$LD_LIBRARY_PATH
+
+export PATH=$DAMASK_ROOT/bin:$PATH

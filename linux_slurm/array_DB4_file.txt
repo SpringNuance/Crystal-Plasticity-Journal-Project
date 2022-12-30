@@ -1,0 +1,7 @@
+/home/springnuance/Desktop/Crystal-Plasticity-COE-Course/simulations/RVE_1_40_D/DB/DB4_GA_discrete/linear_uniaxial_RD/113
+/home/springnuance/Desktop/Crystal-Plasticity-COE-Course/simulations/RVE_1_40_D/DB/DB4_GA_discrete/nonlinear_biaxial_RD/113
+/home/springnuance/Desktop/Crystal-Plasticity-COE-Course/simulations/RVE_1_40_D/DB/DB4_GA_discrete/nonlinear_biaxial_TD/113
+/home/springnuance/Desktop/Crystal-Plasticity-COE-Course/simulations/RVE_1_40_D/DB/DB4_GA_discrete/nonlinear_planestrain_RD/113
+/home/springnuance/Desktop/Crystal-Plasticity-COE-Course/simulations/RVE_1_40_D/DB/DB4_GA_discrete/nonlinear_planestrain_TD/113
+/home/springnuance/Desktop/Crystal-Plasticity-COE-Course/simulations/RVE_1_40_D/DB/DB4_GA_discrete/nonlinear_uniaxial_RD/113
+/home/springnuance/Desktop/Crystal-Plasticity-COE-Course/simulations/RVE_1_40_D/DB/DB4_GA_discrete/nonlinear_uniaxial_TD/113

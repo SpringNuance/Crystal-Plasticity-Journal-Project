@@ -9,60 +9,7 @@ def main():
 
     # Loading the parameter information
     #                                                                                    numOfColumns, startingColumn, spacing, nrows
-    getParamRanges(material, CPLaw, curveIndices, searchingSpace, searchingType, roundContinuousDecimals, 3, 9, 1)
-    general_param_info = loadGeneralParam(material, CPLaw)
-    param_infos = loadParamInfos(material, CPLaw, curveIndices)
-
-
-    mutex = Lock()
-
-    def printAndLog(messages, curveIndex):
-        logPath = f"log/{material}/{CPLaw}/{CPLaw}{curveIndex}_{optimizerName}_{searchingSpace}.txt"
-        messages = list(map(lambda message: f"({CPLaw}{curveIndex}) {message}", messages))
-        with open(logPath, 'a+') as logFile:
-            logFile.writelines(messages)
-        mutex.acquire()
-        for message in messages:
-            print(message, end = '')
-        mutex.release()
-
-    def printAndLogAll(messages, curveIndices):
-        mutex.acquire()
-        for curveIndex in curveIndices:
-            logPath = f"log/{material}/{CPLaw}/{CPLaw}{curveIndex}_{optimizerName}_{searchingSpace}.txt"
-            with open(logPath, 'a+') as logFile:
-                logFile.writelines(messages)
-        for message in messages:
-            print(message, end = '')
-        mutex.release()
-
-
-    info = {
-        'param_info': general_param_info,
-        'server': server,
-        'hyperqueue': hyperqueue,
-        'loadings': loadings,
-        'CPLaw': CPLaw,
-        'initialSims': initialSims,
-        'projectPath': projectPath,
-        'optimizerName': optimizerName,
-        'material': material,
-        'method': method,
-        'searchingSpace': searchingSpace,
-        'roundContinuousDecimals': roundContinuousDecimals,
-        'loadings': loadings
-    }
-
-    ############################################
-    # Generating universal initial simulations #
-    ############################################
-    printAndLogAll(configMessages, curveIndices)
-
-    printAndLogAll(["Generating necessary directories\n"], curveIndices)
-    printAndLogAll([f"The path to your main project folder is\n", f"{projectPath}\n\n"], curveIndices)
-
-    ANNstatus = logInfo()
-    printAndLogAll(ANNstatus, curveIndices)
+    getParamRanges(material, CPLaw, curveIndices, searchingSpace, searchingType, roundContinuousDecimals, 3, 11, 1)
 
     initial_processCurvesGlobal = np.load(f'results/{material}/{CPLaw}/universal/initial_processCurves.npy', allow_pickle=True).tolist()
     initial_trueCurvesGlobal = np.load(f'results/{material}/{CPLaw}/universal/initial_trueCurves.npy', allow_pickle=True).tolist()
@@ -72,8 +19,6 @@ def main():
     np.save(f"results/{material}/{CPLaw}/universal/reverse_initial_processCurves.npy", reverse_initial_processCurvesGlobal)
     # Producing all target curves npy file
     getTargetCurves(material, CPLaw, curveIndices, expTypes, loadings)
-    printAndLogAll([f"Saving reverse and original initial true and process curves\n"], curveIndices)
-    printAndLogAll([f"Finished preparing all target curves\n\n"], curveIndices)
 
     # -------------------------------------------------------------------
     #   Step 1: Loading progress and preparing data
@@ -102,15 +47,6 @@ def main():
     reverse_combine_processCurves = {}
 
     if os.path.exists(f"{iterationPath}/iteration_processCurves.npy"):
-        # Loading iteration curves
-        iteration_trueCurves = np.load(f'{iterationPath}/iteration_trueCurves.npy', allow_pickle=True).tolist()
-        iteration_processCurves = np.load(f'{iterationPath}/iteration_processCurves.npy', allow_pickle=True).tolist()
-        iteration_interpolateCurves = np.load(f'{iterationPath}/iteration_interpolateCurves.npy', allow_pickle=True).tolist()
-        
-        # Loading reverse iteraion curves
-        reverse_iteration_trueCurves = np.load(f'{iterationPath}/reverse_iteration_trueCurves.npy', allow_pickle=True).tolist()
-        reverse_iteration_processCurves = np.load(f'{iterationPath}/reverse_iteration_processCurves.npy', allow_pickle=True).tolist()
-        reverse_iteration_interpolateCurves = np.load(f'{iterationPath}/reverse_iteration_interpolateCurves.npy', allow_pickle=True).tolist()
 
         # Length of initial and iteration simulations
         initial_length = len(reverse_initial_processCurves)
@@ -184,41 +120,6 @@ def main():
     exp_curves["process"] = {}
     exp_curves["interpolate"] = {}
     
-    # Loading the target curve, calculating the interpolating curve and save the compact data of target curve
-    # Loading the target curve, calculating the interpolating curve and save the compact data of target curve
-    for loading in loadings:
-        exp_trueCurve = np.load(f'targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}_true.npy', allow_pickle=True).tolist()
-        exp_processCurve = np.load(f'targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}_process.npy', allow_pickle=True).tolist()
-        # DAMASK simulated curve used as experimental curve
-        if expTypes[curveIndex] == "D":
-            interpolatedStrain = interpolatingStrain(average_initialStrains[loading], exp_processCurve["strain"], exp_processCurve["stress"], yieldingPoints[CPLaw][loading], loading)                 
-            interpolatedStress = interpolatingStress(exp_processCurve["strain"], exp_processCurve["stress"], interpolatedStrain, loading).reshape(-1) * convertUnit
-            exp_interpolateCurve = {
-                "strain": interpolatedStrain,
-                "stress": interpolatedStress
-            }
-        # Actual experimental curve (serrated flow curve and Swift Voce fitted curve)
-        elif expTypes[curveIndex] == "E":
-            interpolatedStrain = interpolatingStrain(average_initialStrains[loading], exp_processCurve["strain"], list(initial_processCurves[loading].values())[0]["stress"], yieldingPoints[CPLaw][loading], loading)                 
-            interpolatedStress = interpolatingStress(exp_processCurve["strain"], exp_processCurve["stress"], interpolatedStrain, loading).reshape(-1) * convertUnit
-            exp_interpolateCurve = {
-                "strain": interpolatedStrain,
-                "stress": interpolatedStress
-            }
-            #print(loading)
-            #print("interpolatedStrain")
-            #print(exp_interpolateCurve["strain"])
-            #print("interpolatedStress")
-            #print(exp_interpolateCurve["stress"])
-            #print("\n")
-        
-        exp_curves["true"][loading] = exp_trueCurve
-        exp_curves["process"][loading] = exp_processCurve
-        exp_curves["interpolate"][loading] = exp_interpolateCurve 
-        np.save(f"targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}_interpolate.npy", exp_curves["interpolate"][loading])
-    #time.sleep(180) 
-    np.save(f"targets/{material}/{CPLaw}/{CPLaw}{curveIndex}_curves.npy", exp_curves)
-       
     # Calculating the combine interpolated curves from combine curves and derive reverse_interpolate curves
     combine_interpolateCurves = {}
     for loading in loadings:
@@ -228,25 +129,11 @@ def main():
             sim_stress = combine_processCurves[loading][paramsTuple]["stress"]
             combine_interpolateCurves[loading][paramsTuple] = {}
             combine_interpolateCurves[loading][paramsTuple]["strain"] = exp_curves["interpolate"][loading]["strain"] 
-            combine_interpolateCurves[loading][paramsTuple]["stress"] = interpolatingStress(sim_strain, sim_stress, exp_curves["interpolate"][loading]["strain"], loading).reshape(-1) * convertUnit
+            combine_interpolateCurves[loading][paramsTuple]["stress"] = interpolatingStress(sim_strain, sim_stress, exp_curves["interpolate"][loading]["strain"], loading).reshape(-1)
 
     reverse_combine_interpolateCurves = reverseAsParamsToLoading(combine_interpolateCurves, loadings)
 
     tupleParamsStresses = list(reverse_combine_interpolateCurves.items())[0:initial_length]
-
-    sortedClosestHardening = list(sorted(tupleParamsStresses, key = lambda paramsStresses: fitnessHardeningAllLoadings(exp_curves["interpolate"], paramsStresses[1], loadings, weightsLoading, weightsHardening)))
-    
-    # Obtaining the default hardening parameters
-    default_params = sortedClosestHardening[0][0]
-
-    default_curves = {}
-    default_curves["parameters_tuple"] = default_params
-    default_curves["parameters_dict"] = dict(default_params)
-    default_curves["true"] = reverse_initial_trueCurves[default_params]
-    default_curves["process"] = reverse_initial_processCurves[default_params]
-    default_curves["interpolate"] = reverse_combine_interpolateCurves[default_params]
-    default_curves["succeeding_iteration"] = 0
-    np.save(f"{iterationPath}/default_curves.npy", default_curves)
 
     # -------------------------------------------------------------------
     #   Step 2: Initialize the regressors for all loadings
@@ -264,6 +151,7 @@ def main():
     for loading in loadings:
         
         if loading == "linear_uniaxial_RD":
+        # if loading == "linear_uniaxial_TD":
         #if loading == "nonlinear_biaxial_RD":
         #if loading == "nonlinear_biaxial_TD":
         #if loading == "nonlinear_planestrain_RD":
@@ -351,19 +239,11 @@ def main():
 
     messages.append(f"The number of combined interpolate curves is {len(combine_interpolateCurves[loading])}\n\n")
     messages.append(f"Finish training ANN for all loadings of curve {CPLaw}{curveIndex}\n\n")
-    printAndLog(messages, curveIndex)
-
-
 
 
 if __name__ == '__main__':
     # External libraries
-    import pandas as pd
     import numpy as np
-    import random
-    import multiprocessing
-    from multiprocessing import Manager
-    from threading import Lock
     from modules.SIM import *
     from modules.preprocessing import *
     from modules.stoploss import *

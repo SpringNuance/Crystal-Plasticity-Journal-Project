@@ -1,0 +1,376 @@
+
+-----------------------------   Welcome to ....   ------------------------------
+                      _______  _______ _______ _______ 
+                     |   _   \|   _   |   _   |   _   |
+                     |.  1   /|.  |   |   1___|   1___|
+                     |.  _   \|.  |   |____   |____   |
+                     |:  1    |:  1   |:  1   |:  1   |
+                     |::.. .  |::.. . |::.. . |::.. . |
+                     `-------'`-------`-------`-------'
+
+                                 Version 1.7.0                                  
+                              26-02-2023 13:53:17                               
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+                               SIMULATION OPTIONS                               
+--------------------------------------------------------------------------------
+|| File input/output 
+ipfile         boss.in
+userfn         C:\Users\nguye\AppData\Local\Temp\ipykernel_5596\180714237.py func
+outfile        boss.out
+rstfile        boss.rst
+
+|| Key settings 
+bounds         0.000E+00 1.000E+00
+kerntype       rbf
+yrange         -1.000E+00 1.000E+00
+noise          1.000E-12
+inittype       sobol
+initpts   5    iterpts   10
+glmin_tol         none
+
+|| Data acquisition 
+acqfn                elcb
+acqtol               1.000E-03
+
+|| GP hyperparameters 
+thetainit       1.000E+00
+thetabounds     1.000E-03 1.000E+03;    5.000E-04 5.000E+00
+thetaprior      gamma
+thetapriorpar   2.000E+00 2.000E+00;    1.571E+00 6.475E+00
+
+|| Hyperparameter optimization
+optimtype      score
+updatefreq   1  initupdate      True
+updateoffset 0  updaterestarts  2
+
+
+|| Miscellaneous
+
+|| Postprocessing
+pp_iters          = None (all iterations will be used if postprocessing is called)
+pp_models         = False
+pp_acq_funcs      = False
+pp_truef_npts     = none
+pp_model_slice        = 1 1 50
+pp_truef_at_glmins = False
+pp_local_minima   = none
+
+
+--------------------------------------------------------------------------------
+                              INITIAL DATAPOINT 1                               
+--------------------------------------------------------------------------------
+| Evaluating objective function at x = 0.000E+00
+| Objective function evaluated, time [s] 0.0
+| Data point added to dataset (x y): 
+  0.0000000000E+00       3.0272099812E+00
+
+| Total ensemble size: 1
+
+Iteration time [s]:    0.003        Total time [s]:    4.326
+
+--------------------------------------------------------------------------------
+                              INITIAL DATAPOINT 2                               
+--------------------------------------------------------------------------------
+| Evaluating objective function at x = 5.000E-01
+| Objective function evaluated, time [s] 0.0
+| Data point added to dataset (x y): 
+  5.0000000000E-01       9.0929742683E-01
+
+| Total ensemble size: 2
+
+Iteration time [s]:    0.003        Total time [s]:    4.329
+
+--------------------------------------------------------------------------------
+                              INITIAL DATAPOINT 3                               
+--------------------------------------------------------------------------------
+| Evaluating objective function at x = 7.500E-01
+| Objective function evaluated, time [s] 0.0
+| Data point added to dataset (x y): 
+  7.5000000000E-01      -5.9932767166E+00
+
+| Total ensemble size: 3
+
+Iteration time [s]:    0.003        Total time [s]:    4.333
+
+--------------------------------------------------------------------------------
+                              INITIAL DATAPOINT 4                               
+--------------------------------------------------------------------------------
+| Evaluating objective function at x = 2.500E-01
+| Objective function evaluated, time [s] 0.0010025501251220703
+| Data point added to dataset (x y): 
+  2.5000000000E-01      -2.1036774620E-01
+
+| Total ensemble size: 4
+
+Iteration time [s]:    0.002        Total time [s]:    4.335
+
+--------------------------------------------------------------------------------
+                              INITIAL DATAPOINT 5                               
+--------------------------------------------------------------------------------
+| Evaluating objective function at x = 3.750E-01
+| Objective function evaluated, time [s] 0.0
+| Data point added to dataset (x y): 
+  3.7500000000E-01       2.9964096163E-02
+
+| Total ensemble size: 5
+| Best acquisition, x_best y_best:
+  7.5000000000E-01      -5.9932767166E+00
+| Global minimum prediction, x_glmin mu_glmin +- nu_glmin:
+  7.5784841611E-01      -6.0086746208E+00  1.4027566844E-02
+
+| GP model hyperparameters:
+  3.0958062586E+00  1.1366499819E-01
+| Next sampling location x_next:
+  8.3089016236E-01
+
+Iteration time [s]:    0.100        Total time [s]:    4.434
+
+--------------------------------------------------------------------------------
+                                 BO ITERATION 1                                 
+--------------------------------------------------------------------------------
+| Evaluating objective function at x = 8.309E-01
+| Objective function evaluated, time [s] 0.0
+| Data point added to dataset (x y): 
+  8.3089016236E-01      -2.7400006858E+00
+
+| Total ensemble size: 6
+| Best acquisition, x_best y_best:
+  7.5000000000E-01      -5.9932767166E+00
+| Global minimum prediction, x_glmin mu_glmin +- nu_glmin:
+  7.3889286297E-01      -6.0599230973E+00  3.3415144551E-02
+| Global minimum convergence, dx_glmin dmu_glmin:
+  1.8955553142E-02  5.6813427251E-03
+
+| GP model hyperparameters:
+  2.9875678591E+00  7.6571878441E-02
+| Next sampling location x_next:
+  6.9087558951E-01
+
+Iteration time [s]:    0.076        Total time [s]:    4.510
+
+--------------------------------------------------------------------------------
+                                 BO ITERATION 2                                 
+--------------------------------------------------------------------------------
+| Evaluating objective function at x = 6.909E-01
+| Objective function evaluated, time [s] 0.0
+| Data point added to dataset (x y): 
+  6.9087558951E-01      -4.1985992953E+00
+
+| Total ensemble size: 7
+| Best acquisition, x_best y_best:
+  7.5000000000E-01      -5.9932767166E+00
+| Global minimum prediction, x_glmin mu_glmin +- nu_glmin:
+  7.4807460574E-01      -5.9958076246E+00  3.3979737002E-04
+| Global minimum convergence, dx_glmin dmu_glmin:
+  9.1817427718E-03  7.1077620202E-03
+
+| GP model hyperparameters:
+  2.9734859236E+00  6.8803142485E-02
+| Next sampling location x_next:
+  7.3498669603E-01
+
+Iteration time [s]:    0.071        Total time [s]:    4.581
+
+--------------------------------------------------------------------------------
+                                 BO ITERATION 3                                 
+--------------------------------------------------------------------------------
+| Evaluating objective function at x = 7.350E-01
+| Objective function evaluated, time [s] 0.0
+| Data point added to dataset (x y): 
+  7.3498669603E-01      -5.7742201497E+00
+
+| Total ensemble size: 8
+| Best acquisition, x_best y_best:
+  7.5000000000E-01      -5.9932767166E+00
+| Global minimum prediction, x_glmin mu_glmin +- nu_glmin:
+  7.5416431860E-01      -6.0048644715E+00  3.1146223730E-05
+| Global minimum convergence, dx_glmin dmu_glmin:
+  6.0897128632E-03  1.0040308454E-03
+
+| GP model hyperparameters:
+  3.1849416509E+00  7.0390735406E-02
+| Next sampling location x_next:
+  9.9997646932E-01
+
+Iteration time [s]:    0.082        Total time [s]:    4.663
+
+--------------------------------------------------------------------------------
+                                 BO ITERATION 4                                 
+--------------------------------------------------------------------------------
+| Evaluating objective function at x = 1.000E+00
+| Objective function evaluated, time [s] 0.0
+| Data point added to dataset (x y): 
+  9.9997646932E-01       1.5829271188E+01
+
+| Total ensemble size: 9
+| Best acquisition, x_best y_best:
+  7.5000000000E-01      -5.9932767166E+00
+| Global minimum prediction, x_glmin mu_glmin +- nu_glmin:
+  7.5727876893E-01      -6.0208925274E+00  1.1085657286E-05
+| Global minimum convergence, dx_glmin dmu_glmin:
+  3.1144503323E-03  7.3447225337E-04
+
+| GP model hyperparameters:
+  8.0405577162E+00  1.0238775392E-01
+| Next sampling location x_next:
+  7.5905028877E-01
+
+Iteration time [s]:    0.085        Total time [s]:    4.749
+
+--------------------------------------------------------------------------------
+                                 BO ITERATION 5                                 
+--------------------------------------------------------------------------------
+| Evaluating objective function at x = 7.591E-01
+| Objective function evaluated, time [s] 0.0
+| Acquisition location too confident, doing pure exploration
+| Data point added to dataset (x y): 
+  7.5905028877E-01      -6.0189981057E+00
+
+| Total ensemble size: 10
+| Best acquisition, x_best y_best:
+  7.5905028877E-01      -6.0189981057E+00
+| Global minimum prediction, x_glmin mu_glmin +- nu_glmin:
+  7.5724789813E-01      -6.0207411874E+00  6.4758100215E-09
+| Global minimum convergence, dx_glmin dmu_glmin:
+  3.0870809157E-05  6.9268659033E-06
+
+| GP model hyperparameters:
+  8.5841215472E+00  1.1918734035E-01
+| Next sampling location x_next:
+  1.1524692649E-01
+
+Iteration time [s]:    0.132        Total time [s]:    4.882
+
+--------------------------------------------------------------------------------
+                                 BO ITERATION 6                                 
+--------------------------------------------------------------------------------
+| Evaluating objective function at x = 1.152E-01
+| Objective function evaluated, time [s] 0.0
+| Acquisition location too confident, doing pure exploration
+| Data point added to dataset (x y): 
+  1.1524692649E-01      -8.5752892187E-01
+
+| Total ensemble size: 11
+| Best acquisition, x_best y_best:
+  7.5905028877E-01      -6.0189981057E+00
+| Global minimum prediction, x_glmin mu_glmin +- nu_glmin:
+  7.5724816285E-01      -6.0207419705E+00  6.5108095803E-09
+| Global minimum convergence, dx_glmin dmu_glmin:
+  2.6472808390E-07  3.5845529876E-08
+
+| GP model hyperparameters:
+  8.5974400637E+00  1.1598185011E-01
+| Next sampling location x_next:
+  1.8118061739E-01
+
+Iteration time [s]:    0.165        Total time [s]:    5.048
+
+--------------------------------------------------------------------------------
+                                 BO ITERATION 7                                 
+--------------------------------------------------------------------------------
+| Evaluating objective function at x = 1.812E-01
+| Objective function evaluated, time [s] 0.0
+| Acquisition location too confident, doing pure exploration
+| Data point added to dataset (x y): 
+  1.8118061739E-01      -8.0645860661E-01
+
+| Total ensemble size: 12
+| Best acquisition, x_best y_best:
+  7.5905028877E-01      -6.0189981057E+00
+| Global minimum prediction, x_glmin mu_glmin +- nu_glmin:
+  7.5724782945E-01      -6.0207410810E+00  6.4651927366E-09
+| Global minimum convergence, dx_glmin dmu_glmin:
+  3.3340457317E-07  4.0715748323E-08
+
+| GP model hyperparameters:
+  8.7203951672E+00  1.1965199829E-01
+| Next sampling location x_next:
+  9.4936556081E-01
+
+Iteration time [s]:    0.151        Total time [s]:    5.200
+
+--------------------------------------------------------------------------------
+                                 BO ITERATION 8                                 
+--------------------------------------------------------------------------------
+| Evaluating objective function at x = 9.494E-01
+| Objective function evaluated, time [s] 0.0
+| Acquisition location too confident, doing pure exploration
+| Data point added to dataset (x y): 
+  9.4936556081E-01       1.2232041783E+01
+
+| Total ensemble size: 13
+| Best acquisition, x_best y_best:
+  7.5905028877E-01      -6.0189981057E+00
+| Global minimum prediction, x_glmin mu_glmin +- nu_glmin:
+  7.5725267092E-01      -6.0207330935E+00  6.4762114781E-09
+| Global minimum convergence, dx_glmin dmu_glmin:
+  4.8414733905E-06  3.6558607522E-07
+
+| GP model hyperparameters:
+  8.0768193023E+00  1.1315401065E-01
+| Next sampling location x_next:
+  4.4404799244E-02
+
+Iteration time [s]:    0.174        Total time [s]:    5.374
+
+--------------------------------------------------------------------------------
+                                 BO ITERATION 9                                 
+--------------------------------------------------------------------------------
+| Evaluating objective function at x = 4.440E-02
+| Objective function evaluated, time [s] 0.0
+| Acquisition location too confident, doing pure exploration
+| Data point added to dataset (x y): 
+  4.4404799244E-02       9.6117436280E-01
+
+| Total ensemble size: 14
+| Best acquisition, x_best y_best:
+  7.5905028877E-01      -6.0189981057E+00
+| Global minimum prediction, x_glmin mu_glmin +- nu_glmin:
+  7.5725305918E-01      -6.0207349253E+00  6.4643667307E-09
+| Global minimum convergence, dx_glmin dmu_glmin:
+  3.8826226911E-07  8.3840722096E-08
+
+| GP model hyperparameters:
+  8.2311803327E+00  1.1494137915E-01
+| Next sampling location x_next:
+  4.3836916686E-01
+
+Iteration time [s]:    0.202        Total time [s]:    5.576
+
+--------------------------------------------------------------------------------
+                                BO ITERATION 10                                 
+--------------------------------------------------------------------------------
+| Evaluating objective function at x = 4.384E-01
+| Objective function evaluated, time [s] 0.0
+| Acquisition location too confident, doing pure exploration
+| Data point added to dataset (x y): 
+  4.3836916686E-01       3.7819481705E-01
+
+| Total ensemble size: 15
+| Best acquisition, x_best y_best:
+  7.5905028877E-01      -6.0189981057E+00
+| Global minimum prediction, x_glmin mu_glmin +- nu_glmin:
+  7.5728071419E-01      -6.0207367241E+00  6.4558064671E-09
+| Global minimum convergence, dx_glmin dmu_glmin:
+  2.7655002226E-05  8.2331515714E-08
+
+| GP model hyperparameters:
+  8.3445833552E+00  1.1824750554E-01
+| Next sampling location x_next:
+  5.7677333493E-01
+
+Iteration time [s]:    0.240        Total time [s]:    5.817
+| Post-processing iteration 0
+| Post-processing iteration 1
+| Post-processing iteration 2
+| Post-processing iteration 3
+| Post-processing iteration 4
+| Post-processing iteration 5
+| Post-processing iteration 6
+| Post-processing iteration 7
+| Post-processing iteration 8
+| Post-processing iteration 9
+| Post-processing iteration 10

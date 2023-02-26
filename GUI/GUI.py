@@ -20,7 +20,7 @@ def main():
             stressUnit = "Pa"
             convertUnit = 1e-6
         #########
-        curveIndex = st.text_input('Please select the curve index', '4')
+        curveIndex = st.text_input('Please select the curve index', '1')
         #########
         optimizerNames = ("GA", "BO", "PSO")
         optimizerName = st.radio("Please select the optimizer", optimizerNames)
@@ -38,6 +38,15 @@ def main():
     # All common data 
 
     loadings = ["linear_uniaxial_RD", 
+                "nonlinear_biaxial_RD", 
+                "nonlinear_biaxial_TD",
+                "nonlinear_planestrain_RD",  
+                "nonlinear_planestrain_TD",
+                "nonlinear_uniaxial_RD",   
+                "nonlinear_uniaxial_TD"]
+
+    loadings = ["linear_uniaxial_RD", 
+                "linear_uniaxial_TD", 
                 "nonlinear_biaxial_RD", 
                 "nonlinear_biaxial_TD",
                 "nonlinear_planestrain_RD",  
@@ -143,14 +152,24 @@ def main():
         targetProcessedCheck = st.checkbox("Plot processed curve", value=True)
         yieldCheck = st.checkbox("Plot yielding point", value=True)
         initialSimCheck = st.checkbox("Plot initial simulations", value=False)
-        expTypes = ("Experimental curve", "DAMASK simulated curve")
-        expType = st.radio("Please select the experimental curve type", expTypes)
         initialSimTypes = ("True curves", "Processed curves")
         initialSimType = st.radio("Please select the initial simulation curve type", initialSimTypes)
         for loading in loadings:
             title = ""
             size = 15
             figure(figsize=(6, 4))
+            currentPath = f"targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}.xlsx"
+            if targetTrueCheck:
+                trueCurve = preprocessExperimentalTrue(currentPath, True)
+                trueStrain = trueCurve["strain"]
+                trueStress = trueCurve["stress"] * convertUnit
+                plt.plot(trueStrain, trueStress, c='blue', label="Experimental", alpha = 1)
+            if targetProcessedCheck:
+                processCurve = preprocessExperimentalFitted(currentPath, True)
+                processStrain = processCurve["strain"]
+                processStress = processCurve["stress"] * convertUnit
+                plt.plot(processStrain, processStress, c='black', label="Swift - Voce fitting")
+            title += f"Target curve " 
             if initialSimCheck:
                 if initialSimType == "True curves":
                     initial_data = np.load(f'results/{material}/{CPLaw}/universal/initial_trueCurves.npy', allow_pickle=True)
@@ -163,35 +182,8 @@ def main():
                     plt.plot(strain, stress, c='orange', alpha=0.07)
                 plt.plot(strain, stress, label = f"Initial simulations x 500",c='orange', alpha=0.3)
                 title += f" | Universal initial simulations\n({CPLaw} law)"
-            if expType == "Experimental curve":
-                currentPath = f"targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}.xlsx"
-                if targetTrueCheck:
-                    trueCurve = preprocessExperimentalTrue(currentPath, True)
-                    trueStrain = trueCurve["strain"]
-                    trueStress = trueCurve["stress"] * convertUnit
-                    plt.plot(trueStrain, trueStress, c='blue', label="Experimental", alpha = 1)
-                if targetProcessedCheck:
-                    processCurve = preprocessExperimentalFitted(currentPath, True)
-                    processStrain = processCurve["strain"]
-                    processStress = processCurve["stress"] * convertUnit
-                    plt.plot(processStrain, processStress, c='black', label="Swift - Voce fitting")
-                title += f"Target curve " 
-            if expType == "DAMASK simulated curve":
-                currentPath = f"targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}.txt"
-                if targetTrueCheck:
-                    trueCurve = preprocessDAMASKTrue(currentPath)
-                    trueStrain = trueCurve["strain"]
-                    trueStress = trueCurve["stress"] * convertUnit
-                    plt.plot(trueStrain, trueStress, c='blue', label="True curve")
-                if targetProcessedCheck:
-                    if loading == "linear_uniaxial_RD":
-                        processCurve = preprocessDAMASKLinear(currentPath)
-                    else:
-                        processCurve = preprocessDAMASKNonlinear(currentPath)
-                    processStrain = processCurve["strain"]
-                    processStress = processCurve["stress"] * convertUnit
-                    plt.plot(processStrain, processStress, c='black', label="Processed curve")
-                title += f"experimental curve "
+
+
             if yieldCheck:
                 yieldingPoint = yieldingPoints[CPLaw][loading]
                 plt.axvline(x = yieldingPoint, color = 'black', label = f"Yielding point = {yieldingPoint}", alpha=0.5)

@@ -13,11 +13,13 @@ cd spack
 # Purging all existing modules and setting the USER_SPACK_ROOT variable
 module --force purge
 export USER_SPACK_ROOT=/projappl/project_2004956/spack
+export USER_SPACK_ROOT=/scratch/work/nguyenb5/spack
 
 # Initiating petsc scientific library. Commands different for puhti and mahti servers
 # If these no longer succeeds, please contact CSC staff
 module load spack/v0.18-user (puhti)
 module load spack/v0.17-user (mahti)
+module load triton-dev/spack (triton)
 
 # Finally, initiate the spack
 user-spack-init
@@ -131,6 +133,10 @@ cmake --build build-mesh --target install
 
 # After this you can find the solvers in the directory /projappl/project_2004956/damask3/grid_solver/bin and /projappl/project_2004956/damask3/mesh_solver/bin
 
+# Installing preprocessing and postprocessing tools for damask 3
+module load python-data
+cd /projappl/project_2004956/damask3/damask-3.0.0-alpha6/python
+pip install . --user
 
 
  

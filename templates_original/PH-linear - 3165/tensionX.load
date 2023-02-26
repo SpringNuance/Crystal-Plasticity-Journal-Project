@@ -1,2 +1,0 @@
-fdot * 0 0  0 1e-4 0   0 0 *  stress  0 * *   * * *   * * 0  time 50  incs 50 freq 2
-fdot * 0 0  0 1e-4 0   0 0 *  stress  0 * *   * * *   * * 0  time 2000  incs 1000 freq 50

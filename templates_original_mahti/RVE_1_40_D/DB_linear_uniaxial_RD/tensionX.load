@@ -1,4 +1,0 @@
-fdot * 0 0  0 1e-4 0   0 0 *  stress  0 * *   * * *   * * 0  time 40  incs 40 freq 2
-fdot * 0 0  0 1e-4 0   0 0 *  stress  0 * *   * * *   * * 0  time 130  incs 130 freq 5
-fdot * 0 0  0 1e-4 0   0 0 *  stress  0 * *   * * *   * * 0  time 1550  incs 1000 freq 50
-fdot * 0 0  0 1e-4 0   0 0 *  stress  0 * *   * * *   * * 0  time 300  incs 300 freq 50

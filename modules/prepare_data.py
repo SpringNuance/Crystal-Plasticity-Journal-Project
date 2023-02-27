@@ -22,7 +22,7 @@ def prepare_data():
     np.save(f"results/{material}/{CPLaw}/universal/reverse_initial_processCurves.npy", reverse_initial_processCurvesGlobal)
     
     # Producing all target curves npy file
-    getTargetCurves(material, CPLaw, curveIndices, expTypes, loadings)
+    getTargetCurves(material, CPLaw, curveIndex, loadings)
 
     print(f"Saving reverse and original initial true and process curves\n")
     print(f"Finished preparing all target curves\n\n")
@@ -146,22 +146,13 @@ def prepare_data():
         exp_trueCurve = np.load(f'targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}_true.npy', allow_pickle=True).tolist()
         exp_processCurve = np.load(f'targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}_process.npy', allow_pickle=True).tolist()
         # DAMASK simulated curve used as experimental curve
-        if expTypes[curveIndex] == "D":
-            interpolatedStrain = interpolatingStrain(average_initialStrains[loading], exp_processCurve["strain"], exp_processCurve["stress"], yieldingPoints[CPLaw][loading], loading)                 
-            interpolatedStress = interpolatingStress(exp_processCurve["strain"], exp_processCurve["stress"], interpolatedStrain, loading).reshape(-1)
-            exp_interpolateCurve = {
-                "strain": interpolatedStrain,
-                "stress": interpolatedStress
-            }
-        # Actual experimental curve (serrated flow curve and Swift Voce fitted curve)
-        elif expTypes[curveIndex] == "E":
-            interpolatedStrain = interpolatingStrain(average_initialStrains[loading], exp_processCurve["strain"], list(initial_processCurves[loading].values())[0]["stress"], yieldingPoints[CPLaw][loading], loading)                 
-            interpolatedStress = interpolatingStress(exp_processCurve["strain"], exp_processCurve["stress"], interpolatedStrain, loading).reshape(-1) 
-            exp_interpolateCurve = {
-                "strain": interpolatedStrain,
-                "stress": interpolatedStress
-            }
-        
+        interpolatedStrain = interpolatingStrain(average_initialStrains[loading], exp_processCurve["strain"], exp_processCurve["stress"], yieldingPoints[CPLaw][loading], loading)                 
+        interpolatedStress = interpolatingStress(exp_processCurve["strain"], exp_processCurve["stress"], interpolatedStrain, loading).reshape(-1)
+        exp_interpolateCurve = {
+            "strain": interpolatedStrain,
+            "stress": interpolatedStress
+        }
+
         exp_curves["true"][loading] = exp_trueCurve
         exp_curves["process"][loading] = exp_processCurve
         exp_curves["interpolate"][loading] = exp_interpolateCurve 

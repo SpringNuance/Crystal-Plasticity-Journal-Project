@@ -25,7 +25,7 @@ def formula3(numberOfHiddenLayers, layerNum, inputSize, outputSize):
     return hiddenSize
 
 def MSE_loss(y_pred, y_true):
-    loss = nn.MSELoss()
+    loss = F.mse_loss
     lossValue = loss(torch.FloatTensor(y_pred), torch.FloatTensor(y_true))
     return lossValue.detach().item()
 

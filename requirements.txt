@@ -22,3 +22,4 @@ pymoo
 modules.preprocessing
 modules.stoploss
 modules.helper
+aalto-boss

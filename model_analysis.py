@@ -7,18 +7,13 @@
 
 def main():
 
-    # Loading the parameter information
-    #                                                                                    numOfColumns, startingColumn, spacing, nrows
-    getParamRanges(material, CPLaw, curveIndices, searchingSpace, searchingType, roundContinuousDecimals, 3, 11, 1)
-
-    initial_processCurvesGlobal = np.load(f'results/{material}/{CPLaw}/universal/initial_processCurves.npy', allow_pickle=True).tolist()
-    initial_trueCurvesGlobal = np.load(f'results/{material}/{CPLaw}/universal/initial_trueCurves.npy', allow_pickle=True).tolist()
-    reverse_initial_trueCurvesGlobal = reverseAsParamsToLoading(initial_trueCurvesGlobal, loadings)
-    reverse_initial_processCurvesGlobal = reverseAsParamsToLoading(initial_processCurvesGlobal, loadings)
-    np.save(f"results/{material}/{CPLaw}/universal/reverse_initial_trueCurves.npy", reverse_initial_trueCurvesGlobal)
-    np.save(f"results/{material}/{CPLaw}/universal/reverse_initial_processCurves.npy", reverse_initial_processCurvesGlobal)
-    # Producing all target curves npy file
-    getTargetCurves(material, CPLaw, curveIndices, expTypes, loadings)
+    initial_processCurves = {}
+    initial_trueCurves = {}
+    for loading in loadings:
+        initial_processCurves[loading] = np.load(f'results/{material}/{CPLaw}/universal/{loading}/initial_processCurves.npy', allow_pickle=True).tolist()
+        initial_trueCurves[loading] = np.load(f'results/{material}/{CPLaw}/universal/{loading}/initial_trueCurves.npy', allow_pickle=True).tolist()
+    #print(initial_processCurves[example_loading][(('dipole', 5.04253), ('islip', 760.12006), ('omega', 6.15309), ('p', 0.41821), ('q', 1.68084), ('tausol', 155.32767), ('Qs', 3.72866), ('Qc', 1.703), ('v0', 38.09405), ('rho_e', 10.10506))])
+    getTargetCurves(material, CPLaw, curveIndex, loadings)
 
     # -------------------------------------------------------------------
     #   Step 1: Loading progress and preparing data
@@ -27,114 +22,52 @@ def main():
     messages = []
     messages.append(70 * "*" + "\n")
     messages.append(f"Step 1: Loading progress and preparing data for curve {CPLaw}{curveIndex}\n\n")
-    
-    iterationPath = f"results/{material}/{CPLaw}/{CPLaw}{curveIndex}_{optimizerName}_{searchingSpace}"
-    initialPath = f"results/{material}/{CPLaw}/universal"
-    # Loading initial curves
-    initial_trueCurves = np.load(f'{initialPath}/initial_trueCurves.npy', allow_pickle=True).tolist()
-    initial_processCurves = np.load(f'{initialPath}/initial_processCurves.npy', allow_pickle=True).tolist()
-    
-    # Loading reverse initial curves
-    reverse_initial_trueCurves = np.load(f'{initialPath}/reverse_initial_trueCurves.npy', allow_pickle=True).tolist()
-    reverse_initial_processCurves = np.load(f'{initialPath}/reverse_initial_processCurves.npy', allow_pickle=True).tolist()
-    
-    # Create combine curves
-    combine_trueCurves = {}
-    combine_processCurves = {}
-
-    # Create reverse combine curves
-    reverse_combine_trueCurves = {}
-    reverse_combine_processCurves = {}
-
-    if os.path.exists(f"{iterationPath}/iteration_processCurves.npy"):
-
-        # Length of initial and iteration simulations
-        initial_length = len(reverse_initial_processCurves)
-        iteration_length = len(reverse_iteration_processCurves)
         
-        messages.append(f"Curve {CPLaw}{curveIndex} status: \n")
-        messages.append(f"{iteration_length} iteration simulations completed.\n")
-        messages.append(f"{initial_length} initial simulations completed.\n")     
-        messages.append(f"Total: {initial_length + iteration_length} simulations completed.")
-        
-        # Updating the combine curves with the initial simulations and iteration curves 
-        for loading in loadings:
-            combine_trueCurves[loading] = {}
-            combine_processCurves[loading] = {}
-            
-            combine_trueCurves[loading].update(initial_trueCurves[loading])
-            combine_processCurves[loading].update(initial_processCurves[loading])
-
-            combine_trueCurves[loading].update(iteration_trueCurves[loading])
-            combine_processCurves[loading].update(iteration_processCurves[loading])
-        
-        # Updating the reverse combine curves with the reverse initial simulations and reverse iteration curves 
-        reverse_combine_trueCurves.update(reverse_initial_trueCurves)
-        reverse_combine_processCurves.update(reverse_initial_processCurves)
-
-        reverse_combine_trueCurves.update(reverse_iteration_trueCurves)
-        reverse_combine_processCurves.update(reverse_iteration_processCurves)
-    else:
-        # Creating empty iteration curves
-        iteration_trueCurves = {}
-        iteration_processCurves = {}
-        iteration_interpolateCurves = {}
-        for loading in loadings:
-            iteration_trueCurves[loading] = {}
-            iteration_processCurves[loading] = {}
-            iteration_interpolateCurves[loading] = {}
-
-        # Creating empty reverse iteraion curves
-        reverse_iteration_trueCurves = {}
-        reverse_iteration_processCurves = {}
-        reverse_iteration_interpolateCurves = {}
-
-        # Updating the combine curves with only initial simulations 
-        for loading in loadings:
-            combine_trueCurves[loading] = {}
-            combine_processCurves[loading] = {}
-            
-            combine_trueCurves[loading].update(initial_trueCurves[loading])
-            combine_processCurves[loading].update(initial_processCurves[loading])
-
-        # Updating the reverse combine curves with only reverse initial curves 
-        reverse_combine_trueCurves.update(reverse_initial_trueCurves)
-        reverse_combine_processCurves.update(reverse_initial_processCurves)
-
-        initial_length = len(reverse_initial_processCurves)    
-        iteration_length = 0
-
-        messages.append(f"Curve {CPLaw}{curveIndex} status: \n")
-        messages.append(f"{initial_length} initial simulations completed.\n")
-        messages.append(f"No additional iteration simulations completed.\n")
     all_initialStrains = {}
+    all_initialStress = {}
     average_initialStrains = {}
-
+    
     # Calculating average strain from initial simulations 
     for loading in loadings:
+        all_initialStress[loading] = np.array(list(map(lambda strainstress: strainstress["stress"], initial_processCurves[loading].values())))
         all_initialStrains[loading] = np.array(list(map(lambda strainstress: strainstress["strain"], initial_processCurves[loading].values())))
         average_initialStrains[loading] = all_initialStrains[loading].mean(axis=0)
-
+    #print(len(list(all_initialStrains[loading])))
+    #print(all_initialStress[example_loading][0])
     exp_curves = {}
     exp_curves["true"] = {}
     exp_curves["process"] = {}
     exp_curves["interpolate"] = {}
-    
+
+    # Loading the target curve, calculating the interpolating curve and save the compact data of target curve
+    for loading in loadings:
+        exp_trueCurve = np.load(f'targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}_true.npy', allow_pickle=True).tolist()
+        exp_processCurve = np.load(f'targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}_process.npy', allow_pickle=True).tolist()
+        # DAMASK simulated curve used as experimental curve
+        interpolatedStrain = interpolatingStrain(average_initialStrains[loading], exp_processCurve["strain"], all_initialStress[loading][0], yieldingPoints[CPLaw][loading], loading)                 
+        interpolatedStress = interpolatingStress(exp_processCurve["strain"], exp_processCurve["stress"], interpolatedStrain, loading).reshape(-1)
+        exp_interpolateCurve = {
+            "strain": interpolatedStrain,
+            "stress": interpolatedStress
+        }
+        exp_curves["true"][loading] = exp_trueCurve
+        exp_curves["process"][loading] = exp_processCurve
+        exp_curves["interpolate"][loading] = exp_interpolateCurve 
+        np.save(f"targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}_interpolate.npy", exp_curves["interpolate"][loading])
+    #time.sleep(180) 
+    np.save(f"targets/{material}/{CPLaw}/{CPLaw}{curveIndex}_curves.npy", exp_curves)
+
     # Calculating the combine interpolated curves from combine curves and derive reverse_interpolate curves
     combine_interpolateCurves = {}
     for loading in loadings:
         combine_interpolateCurves[loading] = {}
-        for paramsTuple in combine_processCurves[loading]:
-            sim_strain = combine_processCurves[loading][paramsTuple]["strain"]
-            sim_stress = combine_processCurves[loading][paramsTuple]["stress"]
+        for paramsTuple in initial_processCurves[loading]:
+            sim_strain = initial_processCurves[loading][paramsTuple]["strain"]
+            sim_stress = initial_processCurves[loading][paramsTuple]["stress"]
             combine_interpolateCurves[loading][paramsTuple] = {}
             combine_interpolateCurves[loading][paramsTuple]["strain"] = exp_curves["interpolate"][loading]["strain"] 
             combine_interpolateCurves[loading][paramsTuple]["stress"] = interpolatingStress(sim_strain, sim_stress, exp_curves["interpolate"][loading]["strain"], loading).reshape(-1)
-
-    reverse_combine_interpolateCurves = reverseAsParamsToLoading(combine_interpolateCurves, loadings)
-
-    tupleParamsStresses = list(reverse_combine_interpolateCurves.items())[0:initial_length]
-
+    initial_length = len(list(combine_interpolateCurves[loading]))
     # -------------------------------------------------------------------
     #   Step 2: Initialize the regressors for all loadings
     # -------------------------------------------------------------------
@@ -159,13 +92,14 @@ def main():
         #if loading == "nonlinear_uniaxial_RD":
         #if loading == "nonlinear_uniaxial_TD": 
             paramFeatures = np.array([list(dict(params).values()) for params in list(combine_interpolateCurves[loading].keys())])
-            stressLabels = np.array([strainstress["stress"] for strainstress in list(combine_interpolateCurves[loading].values())])
+            stressLabels = np.array([strainstress["stress"] * 1e-6 for strainstress in list(combine_interpolateCurves[loading].values())])
+
 
             # Input and output size of the ANN
             sampleSize = stressLabels.shape[0]
             inputSize = paramFeatures.shape[1]
             outputSize = stressLabels.shape[1]
-            total_length = initial_length + iteration_length
+            total_length = initial_length
             #total_length = initial_length
             print("The total number of curves is", total_length)
             test_ratio = 0.1
@@ -215,14 +149,25 @@ def main():
 
             epochs_trainingErrors = {}
             epochs_validationErrors = {}
-            increments = 100
-            epochs = 100
+            increments = 1000
+            epochs = 2200
             while epochs <= 3000:
                 print(f"Number of epochs {epochs}")
-                regressors[loading] = NeuralNetwork(inputSize, outputSize, hiddenNodesFormula, numberOfHiddenLayers, sampleSize).to(device)
-                trainingError = regressors[loading].train(paramFeatures_train, stressLabels_train, ANNOptimizer, learning_rate, epochs, L2_regularization)
-                stressLabels_predict = regressors[loading].predict(paramFeatures_test)
-                validationError = MSE_loss(stressLabels_predict, stressLabels_test)
+                #regressors[loading] = NeuralNetwork(inputSize, outputSize, hiddenNodesFormula, numberOfHiddenLayers, sampleSize).to(device)
+                #trainingError = regressors[loading].train(paramFeatures_train, stressLabels_train, ANNOptimizer, learning_rate, epochs, L2_regularization)
+                #stressLabels_predict = regressors[loading].predict(paramFeatures_test)
+                #validationError = MSE_loss(stressLabels_predict, stressLabels_test)
+                regressors[loading] = NeuralNetwork(outputSize, inputSize, hiddenNodesFormula, numberOfHiddenLayers, sampleSize).to(device)
+                trainingError = regressors[loading].train(stressLabels_train, paramFeatures_train, ANNOptimizer, learning_rate, epochs, L2_regularization)
+
+                paramFeatures_predict = regressors[loading].predict(stressLabels_test)
+                validationError = MSE_loss(paramFeatures_predict, paramFeatures_test)
+                predictParams = regressors[loading].predictOneDimension(stressLabels[0])
+                print("True param")
+                print(paramFeatures[0])
+                print("Predicted param")
+                print(np.squeeze(scalers[loading].inverse_transform(predictParams)))
+                
                 print(f"Training error: {trainingError[-1]}")
                 print(f"Validation error: {validationError}\n")
                 epochs_trainingErrors[f"{str(epochs)}"] = trainingError[-1]

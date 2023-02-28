@@ -1,0 +1,101 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <title>Grain Neighbors ( Toolbox)
+         
+      </title>
+      <!-- DOCNAME:  Toolbox -->
+      <meta name="chunktype" content="refpage">
+      <!-- CHUNKNAME: GrainNeighbours -->
+      <!-- HEADSTUFF: GrainNeighbours -->
+      <!-- HEADSTUFF -->
+      <meta name="refentity" content="method:GrainNeighbours">
+      <meta http-equiv="Content-Script-Type" content="text/javascript">
+      <meta name="toctype" content="fcn">
+      <link rel="stylesheet" href="style.css"><script language="JavaScript" src="docscripts.js"></script></head>
+   <body><a name="top_of_page"></a><div>
+         <table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+               <td valign="baseline"></td>
+            </tr>
+         </table>
+         <p style="font-size:1px;"></p>
+      </div>
+      <div class="content">
+         <h1 class="refname">Grain Neighbors</h1>
+         <div class="subheading"></div>
+         <p>In this section we discuss how to analyze the neighbouring relationships between grains. While most of this can be done also
+            on the level of grain boundaries an local misorientations it is for large data sets sometimes useful to consider misorientations
+            between the meanorienations of grains. We shall use the following Magnesium data set of our explainations.
+         </p><pre class="codeinput"><span class="comment">% load sample EBSD data set</span>
+mtexdata <span class="string">twins</span> <span class="string">silent</span>
+CS = ebsd(<span class="string">'indexed'</span>).CS;
+
+<span class="comment">% reconstruct grains</span>
+[grains, ebsd.grainId] = calcGrains(ebsd(<span class="string">'indexed'</span>),<span class="string">'angle'</span>,5*degree);
+
+grains = smooth(grains,5);
+
+<span class="comment">% plot the grains</span>
+plot(grains,grains.meanOrientation)</pre><img src="GrainNeighbours_01.png"> <p>Central for the analysis of grain to grain relationships is the function <a href="grain2d.neighbors.html"><tt>grains.neighbours</tt></a>. It return a list of pairs of neighbouring grain ids. Each row of the list containes the ids of two neighbouring grains.
+            In the following lines choose the row number 170 and outline the corresponding grains
+         </p><pre class="codeinput">pairs = grains.neighbors;
+
+hold <span class="string">on</span>
+plot(grains(pairs(170,:)).boundary,<span class="string">'LineWidth'</span>,4,<span class="string">'linecolor'</span>,<span class="string">'b'</span>)
+hold <span class="string">off</span></pre><img src="GrainNeighbours_02.png"> <p>In order to compute the misorentation between these two grains we can do</p><pre class="codeinput">mori = inv(grains(pairs(170,1)).meanOrientation) * grains(pairs(170,2)).meanOrientation</pre><pre class="codeoutput"> 
+mori = misorientation (Magnesium &#8594; Magnesium)
+ 
+  Bunge Euler angles in degree
+     phi1     Phi    phi2    Inv.
+  107.142 58.9469  309.49       0
+ 
+</pre><p>This can be generalized to compute the misorientations between neighbouring grains using</p><pre class="codeinput">mori = inv(grains(pairs(:,1)).meanOrientation) .* grains(pairs(:,2)).meanOrientation
+
+close <span class="string">all</span>
+histogram(mori.angle./degree)
+xlabel(<span class="string">'misorientation angle'</span>)</pre><pre class="codeoutput"> 
+mori = misorientation (Magnesium &#8594; Magnesium)
+  size: 251 x 1
+</pre><img src="GrainNeighbours_03.png"> <p>We observe a high peak at about 85 degree. This angle corresponds to twinning. In Magnesium the twinning orientation relationship
+            is given by
+         </p><pre class="codeinput">twinning = orientation.map(Miller(0,1,-1,-2,CS),Miller(0,-1,1,-2,CS),<span class="keyword">...</span>
+  Miller(2,-1,-1,0,CS),Miller(2,-1,-1,0,CS))</pre><pre class="codeoutput"> 
+twinning = misorientation (Magnesium &#8594; Magnesium)
+ 
+ (1-101) || (10-11)   [01-11] || [01-1-1]
+ 
+</pre><p>In order to determine the percentage of twinnig pairs we do</p><pre class="codeinput"><span class="comment">% which of the pairs are twinning</span>
+isTwinning = angle(mori,twinning) &lt; 3*degree;
+
+<span class="comment">% percentage of twinning pairs</span>
+100 * sum(isTwinning) / length(isTwinning)</pre><pre class="codeoutput">ans =
+   37.0518
+</pre><p>It is important to understand that the list returned by <tt>grains.neighbours</tt> containes only pairs such that both grains are contained in <tt>grains</tt>. This allows the syntax <tt>grains('phaseName')</tt> to extract only neighbour relation ships within one phase.
+         </p>
+         <p>In some case, e.g. if we ask for all neighbouring grains to a given grains, it is useful to replace this constraint by the
+            condition that at least one grain should by part of <tt>grains</tt>. This can be accomplished by the option <tt>'full'</tt>.
+         </p><pre class="codeinput"><span class="comment">% get all pairs containing grain 83</span>
+pairs = grains(83).neighbors(<span class="string">'full'</span>);
+
+<span class="comment">% remove center grain 83 from this list</span>
+pairs(pairs == 83) = [];
+
+plot(grains,grains.meanOrientation,<span class="string">'micronbar'</span>,<span class="string">'off'</span>)
+hold <span class="string">on</span>
+plot(grains(pairs).boundary,<span class="string">'lineColor'</span>,<span class="string">'blue'</span>,<span class="string">'lineWidth'</span>,3)
+hold <span class="string">on</span>
+plot(grains(83).boundary,<span class="string">'lineColor'</span>,<span class="string">'red'</span>,<span class="string">'lineWidth'</span>,3)
+hold <span class="string">off</span></pre><img src="GrainNeighbours_04.png"> <p style="font-size:1px;"></p>
+         <table class="footer" border="0" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+               <td valign="baseline" align="right"></td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

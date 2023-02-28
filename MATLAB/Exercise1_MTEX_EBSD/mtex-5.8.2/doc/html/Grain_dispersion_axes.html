@@ -1,0 +1,166 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <title>Using fibres to evaluate grain dispersion axes ( Toolbox)
+         
+      </title>
+      <!-- DOCNAME:  Toolbox -->
+      <meta name="chunktype" content="refpage">
+      <!-- CHUNKNAME: Grain_dispersion_axes -->
+      <!-- HEADSTUFF: Grain_dispersion_axes -->
+      <!-- HEADSTUFF -->
+      <meta name="refentity" content="method:Grain_dispersion_axes">
+      <meta http-equiv="Content-Script-Type" content="text/javascript">
+      <meta name="toctype" content="fcn">
+      <link rel="stylesheet" href="style.css"><script language="JavaScript" src="docscripts.js"></script></head>
+   <body><a name="top_of_page"></a><div>
+         <table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+               <td valign="baseline"></td>
+            </tr>
+         </table>
+         <p style="font-size:1px;"></p>
+      </div>
+      <div class="content">
+         <h1 class="refname">Using fibres to evaluate grain dispersion axes</h1>
+         <div class="subheading"></div>
+         <p>We will prepare some data to evaluate grain dispersion axes.</p><pre class="codeinput">mtexdata <span class="string">forsterite</span>
+[grains,ebsd.grainId] = ebsd.calcGrains;
+
+<span class="comment">% just use the larger grains of forsterite</span>
+ebsd(grains(grains.grainSize&lt; 100))=<span class="string">'notIndexed'</span>;
+ebsd({<span class="string">'e'</span> <span class="string">'d'</span>})=<span class="string">'notIndexed'</span>;
+
+<span class="comment">% lets also ignore inclusions for a nicer plotting experience</span>
+ebsd(grains(grains.isInclusion))=[];
+[grains,ebsd.grainId, ebsd.mis2mean] = ebsd.calcGrains;</pre><pre class="codeoutput"> 
+ebsd = EBSD
+ 
+ Phase  Orientations     Mineral         Color  Symmetry  Crystal reference frame
+     0   58485 (24%)  notIndexed                                                 
+     1  152345 (62%)  Forsterite  LightSkyBlue       mmm                         
+     2   26058 (11%)   Enstatite  DarkSeaGreen       mmm                         
+     3   9064 (3.7%)    Diopside     Goldenrod     12/m1       X||a*, Y||b*, Z||c
+ 
+ Properties: bands, bc, bs, error, mad, x, y
+ Scan unit : um
+ 
+</pre><p>We colorize axes of the misorientation to the grain mean orientation in speciemn coordinates</p><pre class="codeinput">ck = axisAngleColorKey(ebsd(<span class="string">'f'</span>).CS);
+ck.oriRef=grains(<span class="string">'id'</span>,ebsd(<span class="string">'f'</span>).grainId).meanOrientation;
+plot(ebsd(<span class="string">'f'</span>), ck.orientation2color(ebsd(<span class="string">'f'</span>).orientations))
+hold <span class="string">on</span>
+plot(grains.boundary)
+
+hold <span class="string">on</span>
+plot(grains,<span class="string">'FaceAlpha'</span>,0.3)
+hold <span class="string">off</span></pre><img src="Grain_dispersion_axes_01.png"> <h2>Visualizing dispersion of orientations via directions<a name="3"> </a></h2><pre class="codeinput"><span class="comment">% First, we will inspect a selected grain</span>
+grain_selected = grains(5095, 7803);
+hold <span class="string">on</span>
+plot(grain_selected.boundary,<span class="string">'linewidth'</span>,3,<span class="string">'linecolor'</span>,<span class="string">'b'</span>)
+hold <span class="string">off</span>
+
+<span class="comment">% and examine the spread of orientations in terms of its pole figure. In</span>
+<span class="comment">% order to do so, we can define a grid of crystal direction and compute the</span>
+<span class="comment">% corresponding specimen directions for each orientation within the grain.</span>
+
+<span class="comment">% Let's define a grid of directions</span>
+s2G = equispacedS2Grid(<span class="string">'resolution'</span>,15*degree);
+s2G = Miller(s2G,ebsd(<span class="string">'f'</span>).CS)
+
+<span class="comment">% use the orientations of points belonging to the grain</span>
+o = ebsd(grain_selected).orientations;
+
+<span class="comment">% and compute the corresponding specimen directions</span>
+d = o .* s2G;
+
+<span class="comment">% and plot them</span>
+plot(d,<span class="string">'MarkerSize'</span>,3,<span class="string">'upper'</span>)
+<span class="comment">% We can observe, that certain grid points are smeared out more than others</span></pre><pre class="codeoutput"> 
+s2G = Miller (Forsterite)
+ size: 1 x 184
+ resolution: 15&deg;
+</pre><img src="Grain_dispersion_axes_02.png"> <pre class="codeinput"><span class="comment">%Next, we compute the mean angular deviation for each group of grid points</span>
+vd = mean(angle(mean(d),d));
+<span class="comment">% and plot those</span>
+plot(d,repmat(vd,length(o),1)/degree,<span class="string">'MarkerSize'</span>,3)
+mtexColorbar(<span class="string">'title'</span>,<span class="string">'avergage pole dispersion'</span>)
+
+
+<span class="comment">% and we can ask which grid point is the one with the smallest dispersion</span>
+[~,id_min]=min(vd);
+disp_ax_grid = grain_selected.meanOrientation .* s2G(id_min);
+annotate(disp_ax_grid)
+annotate(disp_ax_grid,<span class="string">'plane'</span>,<span class="string">'linestyle'</span>,<span class="string">'--'</span>,<span class="string">'linewidth'</span>,2)
+
+<span class="comment">% While we might have guessed the result by eye, it is not too satisfying since</span>
+<span class="comment">% the direction of the estiamted dispersion axis will always be located</span>
+<span class="comment">% on a grid point</span></pre><img src="Grain_dispersion_axes_03.png"> <p>If we assume, the orientations are dispersed along one single axis, we can fit an orientation fibre <a href="fibre.fibre.html"><tt>fibre</tt></a></p><pre class="codeinput"><span class="comment">% This can be accomplished by |fibre.fit|</span>
+fib = fibre.fit(o,<span class="string">'local'</span>)
+
+<span class="comment">% the fibre has an axis in specimen coordinates |fib.r| and in crystal</span>
+<span class="comment">% coordinates |fib.h|.</span>
+fib.r
+fib.h
+
+<span class="comment">% and we can visualize those also in our previous plot</span>
+annotate(fib.r,<span class="string">'MarkerFaceColor'</span>,<span class="string">'r'</span>)
+annotate(fib.r,<span class="string">'plane'</span>,<span class="string">'linestyle'</span>,<span class="string">'-.'</span>,<span class="string">'linewidth'</span>,2,<span class="string">'lineColor'</span>,<span class="string">'r'</span>)</pre><pre class="codeoutput"> 
+fib = fibre (Forsterite &#8594; xyz)
+ 
+  h || r: (1 11 -2) || (12,5,-3)
+ 
+ans = vector3d
+        x         y         z
+  0.89864  0.376589 -0.225003
+ 
+ans = Miller (Forsterite)
+       h       k       l
+  1.0362  9.5489 -1.6628
+</pre><img src="Grain_dispersion_axes_04.png"> <p>We can also inspect in orientation space, how well the fibre fits the orientations of the grain</p><pre class="codeinput"><span class="comment">% The angle between each orientation and the fibre gives a measure how well</span>
+<span class="comment">% it is fitted by the fibre</span>
+fd = angle(fib,o)/degree;
+plot(o,fd)
+xlim([0 30]); ylim([60 90]); zlim([60 90])
+grid <span class="string">minor</span>
+hold <span class="string">on</span>
+plot(fib)
+hold <span class="string">off</span>
+
+nextAxis
+<span class="comment">% we can also inspect the distance of each orientation within the grains</span>
+<span class="comment">% to the fitted fibre with the grains</span>
+plot(ebsd(grain_selected),fd)
+mtexColorbar(<span class="string">'title'</span>, <span class="string">'distance from fibre'</span>)</pre><pre class="codeoutput">plot 2000 random orientations out of 2826 given orientations
+</pre><img src="Grain_dispersion_axes_05.png"> <p>TODO: use eigenvalues of fibre.fit  to give measure of "fibryness" [fib, lambda] = fibre.fit(o,'local') lambda(2)/lambda(3)</p>
+         <h2>Bulk evaluation<a name="8"> </a></h2>
+         <p>We can fit a fibre for each grain and write out the axes in crystal as well as in specimen coordiantes</p><pre class="codeinput"><span class="comment">%ids = grains('f').id;</span>
+<span class="comment">%clear fib_axSC fib_axCC</span>
+<span class="comment">%for i = 1:length(ids)</span>
+<span class="comment">%        o = ebsd(grains('id',ids(i))).orientations;</span>
+<span class="comment">%        fib = fibre.fit(o);</span>
+<span class="comment">%        fib_axCC(i) = fib.h;</span>
+<span class="comment">%        fib_axSC(i) = fib.r;</span>
+<span class="comment">%end</span>
+
+<span class="comment">% plot fibre axes in specimen coordinates</span>
+<span class="comment">%opts= {'contourf','antipodal','halfwidth', 10*degree,'contours',[1:10]};</span>
+<span class="comment">%plot(fib_axSC,opts{:})</span>
+<span class="comment">%nextAxis</span>
+<span class="comment">% plot fibre axes in crystal coordinates</span>
+<span class="comment">%plot(fib_axCC,opts{:},'fundamentalRegion')</span>
+<span class="comment">%mtexColorbar</span>
+
+<span class="comment">% Now we can start to wonder whether the distrubtion of fibre axes relates</span>
+<span class="comment">% to e.g. the kinematic during deformation of the sample.</span></pre><p style="font-size:1px;"></p>
+         <table class="footer" border="0" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+               <td valign="baseline" align="right"></td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

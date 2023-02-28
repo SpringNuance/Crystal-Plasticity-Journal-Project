@@ -189,7 +189,7 @@ def main():
 if __name__ == '__main__':
     # External libraries
     import numpy as np
-    from modules.SIM import *
+    from modules.SIM_damask2 import *
     from modules.preprocessing import *
     from modules.stoploss import *
     from modules.helper import *

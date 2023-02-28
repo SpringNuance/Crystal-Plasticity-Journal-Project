@@ -1,0 +1,91 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <title>Harmonic Representation of Spherical Functions ( Toolbox)
+         
+      </title>
+      <!-- DOCNAME:  Toolbox -->
+      <meta name="chunktype" content="refpage">
+      <!-- CHUNKNAME: S2FunHarmonicRepresentation -->
+      <!-- HEADSTUFF: S2FunHarmonicRepresentation -->
+      <!-- HEADSTUFF -->
+      <meta name="refentity" content="method:S2FunHarmonicRepresentation">
+      <meta http-equiv="Content-Script-Type" content="text/javascript">
+      <meta name="toctype" content="fcn">
+      <link rel="stylesheet" href="style.css"><script language="JavaScript" src="docscripts.js"></script></head>
+   <body><a name="top_of_page"></a><div>
+         <table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+               <td valign="baseline"></td>
+            </tr>
+         </table>
+         <p style="font-size:1px;"></p>
+      </div>
+      <div class="content">
+         <h1 class="refname">Harmonic Representation of Spherical Functions</h1>
+         <div class="subheading"></div>
+         <p>Similarly as periodic functions may be represented as weighted sums of sines and cosines a spherical function <img src="S2FunHarmonicRepresentation_eq02527148203711597490.png">  can be written as series of the form
+         </p>
+         <p><img src="S2FunHarmonicRepresentation_eq03630509030311869132.png"> </p>
+         <p>with respect to Fouriers coefficients <img src="S2FunHarmonicRepresentation_eq01475307049743758257.png">  and the so called spherical harmonics <img src="S2FunHarmonicRepresentation_eq18216378809627623976.png"> .
+         </p>
+         <p>In terms of polar coordinates <img src="S2FunHarmonicRepresentation_eq01282537912716059643.png">  the spherical harmonic of degree <img src="S2FunHarmonicRepresentation_eq18216620034067401164.png">  and order <img src="S2FunHarmonicRepresentation_eq17216086743898025322.png">  is defined by
+         </p>
+         <p><img src="S2FunHarmonicRepresentation_eq15600035340482118581.png"> </p>
+         <p>where <img src="S2FunHarmonicRepresentation_eq06497390666082766116.png"> , <img src="S2FunHarmonicRepresentation_eq07189880969021525937.png"> , and $ l = -m, \ldots m$ denote the associated Legendre-Polynomials.
+         </p>
+         <p>Within the class <tt><a href="S2FunHarmonic.S2FunHarmonic.html">S2FunHarmonic</a></tt> spherical functions are represented by their Fourier coefficients which are stored in the field <tt>fun.fhat</tt>. As an example lets define a harmonic function which Fourier coefficients <img src="S2FunHarmonicRepresentation_eq05880107093042544539.png"> , <img src="S2FunHarmonicRepresentation_eq01974783630290487571.png"> , <img src="S2FunHarmonicRepresentation_eq00573802742399179254.png">  and <img src="S2FunHarmonicRepresentation_eq04904126059922205780.png"> </p><pre class="codeinput">fun = S2FunHarmonic([1;0;3;0])
+
+plot(fun)</pre><pre class="codeoutput"> 
+fun = S2FunHarmonic
+ bandwidth: 1
+</pre><img src="S2FunHarmonicRepresentation_01.png"> <p>This function has the cut off degree <img src="S2FunHarmonicRepresentation_eq04714246563727171144.png"> . As a rule of thumb: smooth functions require only a small cut off degree whereas functions with jumps or sharp edges requires
+            a high cut off degree. If the cut off degree is choosen to small truncation error in the form of high order oscillations are
+            observable like in the following demonstration for the cut off degrees <img src="S2FunHarmonicRepresentation_eq17336450108856055651.png">  and <img src="S2FunHarmonicRepresentation_eq17349476675830501268.png"> .
+         </p><pre class="codeinput">sF = sqrt(abs(S2Fun.smiley(<span class="string">'bandwidth'</span>,256)));
+
+clf;
+<span class="keyword">for</span> bw = [256 128 64 32 16 8]
+  sF.bandwidth = bw;
+  nextAxis;
+  pcolor(sF, <span class="string">'upper'</span>);
+  mtexTitle([<span class="string">'M = '</span> num2str(bw)]);
+<span class="keyword">end</span></pre><img src="S2FunHarmonicRepresentation_02.png"> <p>The computation of the Fourier coefficients can be done in several ways. Lets first assume that the function <img src="S2FunHarmonicRepresentation_eq02527148203711597490.png">  is known explicitely, e.g., <img src="S2FunHarmonicRepresentation_eq05823573061014501524.png"> . In MTEX we can express this as
+         </p><pre class="codeinput">fun = @(v) dot(v,vector3d.X).^9;</pre><p>Now we can compute the Harmonic representation this function and turn it into a variable of type <tt><a href="S2FunHarmonic.S2FunHarmonic.html">S2FunHarmonic</a></tt> using the command <a href="S2FunHarmonic.quadrature.html"><tt>S2FunHarmonic.quadrature</tt></a></p><pre class="codeinput">S2F = S2FunHarmonic.quadrature(fun)
+
+plot(S2F,<span class="string">'upper'</span>)</pre><pre class="codeoutput"> 
+S2F = S2FunHarmonic
+ bandwidth: 128
+</pre><img src="S2FunHarmonicRepresentation_03.png"> <p>We observe that by default Fourier coefficients up the harmonic cut off degree <img src="S2FunHarmonicRepresentation_eq03595771021337337734.png">  are computed. This default value can changed using the option <tt>'bandwidth'</tt>. The decay of the Fourier coefficients can be visualized using the command <a href="S2FunHarmonic.plotSpektra.html">plotSpektra</a> which plot for each harmonic degree <img src="S2FunHarmonicRepresentation_eq18216620034067401164.png">  the sum of the squared moduli of the corresponding Fourier coefficients, i.e. $\sum_{k=-m}^m \lvert \hat f(m,k)\rvert^2$
+         </p><pre class="error">Error updating Text.
+
+ String scalar or character vector must have valid interpreter syntax: 
+$\sum_{k=-m}^m \lvert \hat f(m,k)\rvert^2$
+</pre><pre class="codeinput">close <span class="string">all</span>
+plotSpektra(S2F)</pre><img src="S2FunHarmonicRepresentation_04.png"> <p>In the present example we observe that almost all Fourier coefficients are zero except for very first one. Hence, it might
+            be reasonable to restrict the cut of degree to the non zero Fourier coefficients
+         </p><pre class="codeinput"><span class="comment">% restrict to non zero Fourier coefficients</span>
+S2F = S2F.truncate
+
+<span class="comment">% power plot</span>
+plotSpektra(S2F,<span class="string">'linewidth'</span>,2)</pre><pre class="codeoutput"> 
+S2F = S2FunHarmonic
+ bandwidth: 9
+</pre><img src="S2FunHarmonicRepresentation_05.png"> <p>In The robust estimation of these Fourier coefficients from discrete data is discussed in the secion <a href="S2FunApproximationInterpolation.html">Spherical Approximation</a></p>
+         <p>In particular all operation on those functions are implmented as operations on the Fourier coefficients.</p>
+         <p>The crucial parameter when representing spherical functions by their harmonic series expansion is the harmonic cut off degree
+            <img src="S2FunHarmonicRepresentation_eq09319732146067371049.png"> . .
+         </p>
+         <p>To concluse this session we plot the first ten spherical harmonics</p><pre class="codeinput">surf(S2FunHarmonic(eye(10)))</pre><img src="S2FunHarmonicRepresentation_06.png"> <p style="font-size:1px;"></p>
+         <table class="footer" border="0" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+               <td valign="baseline" align="right"></td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

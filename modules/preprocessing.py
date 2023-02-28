@@ -10,8 +10,8 @@ import time
 # Obtain and process parameter range, step size and rounding decimals # 
 #######################################################################
 
-def getParamRanges(material, CPLaw, curveIndex, searchingSpace, searchingType, roundContinuousDecimals, numOfColumns, startingColumn, spacing):
-    general_range_df = pd.read_excel(f"targets/{material}/{CPLaw}/param_info/param_info.xlsx", usecols=[*range(1,startingColumn-1)], skiprows=1, engine="openpyxl")
+def getParamRanges(material, CPLaw, curveIndex, searchingSpace, roundContinuousDecimals):
+    general_range_df = pd.read_excel(f"targets/{material}/{CPLaw}/param_info/param_info.xlsx", engine="openpyxl")
     general_param_range = general_range_df.set_index(f'parameter').T.to_dict()
     for key in general_param_range:
         rangeOfParam = general_param_range[key]["general_range"].split("-")
@@ -63,68 +63,8 @@ def getParamRanges(material, CPLaw, curveIndex, searchingSpace, searchingType, r
     #time.sleep(60)
     np.save(f'targets/{material}/{CPLaw}/param_info/general_params.npy', general_param_range)
     
-    if searchingType == "general":
-        np.save(f'targets/{material}/{CPLaw}/param_info/{CPLaw}{curveIndex}_params.npy', general_param_range)
+    np.save(f'targets/{material}/{CPLaw}/param_info/{CPLaw}{curveIndex}_params.npy', general_param_range)
     
-    elif searchingType == "specific":
-        indexMin1 = curveIndex - 1
-        suffixMin1 = f".{indexMin1}"     
-        suffix = f".{curveIndex}"
-        beginningColumn = startingColumn + (curveIndex - 1) * spacing + (curveIndex - 1) * numOfColumns
-        endingColumn = startingColumn + (curveIndex - 1) * spacing + curveIndex * numOfColumns
-        df = pd.read_excel(f"targets/{material}/{CPLaw}/param_info/param_info.xlsx", usecols=[*range(beginningColumn, endingColumn)], skiprows=1, engine="openpyxl")
-        df.rename(columns={f"parameter{suffix}": "parameter", f"range{suffixMin1}": "range", f"step{suffixMin1}": "step"}, inplace=True)
-        #print(df)
-
-        param_range_specific = df.set_index(f'parameter').T.to_dict()
-        #print(param_range_specific)
-        param_range = copy.deepcopy(general_param_range)
-
-        for key in param_range:
-            param_range[key]["range"] = param_range_specific[key]["range"]
-            param_range[key]["step"] = param_range_specific[key]["step"]
-            rangeOfParam = param_range[key]["range"].split("-")
-            stepParam = param_range[key]["step"]
-            rangeLow = rangeOfParam[0]
-            rangeHigh = rangeOfParam[1]
-            valueLow = float(rangeLow[1:])
-            valueHigh = float(rangeHigh[:-1])
-            boundaryLow = rangeLow[0]
-            boundaryHigh = rangeHigh[-1]
-            if searchingSpace == "discrete":
-                if boundaryLow == "[":
-                    low = valueLow
-                elif boundaryLow == "(":
-                    low = valueLow + stepParam
-                if boundaryHigh == "]":
-                    high = valueHigh
-                elif boundaryHigh == ")":
-                    low = valueHigh - stepParam
-            elif searchingSpace == "continuous":
-                if boundaryLow == "[":
-                    low = valueLow
-                elif boundaryLow == "(":
-                    low = valueLow + 10 ** - roundContinuousDecimals
-                if boundaryHigh == "]":
-                    high = valueHigh
-                elif boundaryHigh == ")":
-                    low = valueHigh - 10 ** roundContinuousDecimals
-            param_range[key].pop("range")
-            param_range[key]["low"] = low
-            param_range[key]["high"] = high
-            frac, whole = math.modf(stepParam)
-            roundingDecimal = 0
-            if frac == 0:
-                roundingDecimal = 0
-            else:
-                while whole == 0:
-                    stepParam *= 10
-                    roundingDecimal += 1
-                    frac, whole = math.modf(stepParam)
-            param_range[key]["round"] = roundingDecimal
-        #print(param_range)
-        np.save(f'targets/{material}/{CPLaw}/param_info/{CPLaw}{curveIndex}_params.npy', param_range)
-
 def loadParamInfos(material, CPLaw, curveIndex):
     param_ranges = {}
     param_range = np.load(f'targets/{material}/{CPLaw}/param_info/{CPLaw}{curveIndex}_params.npy', allow_pickle=True)

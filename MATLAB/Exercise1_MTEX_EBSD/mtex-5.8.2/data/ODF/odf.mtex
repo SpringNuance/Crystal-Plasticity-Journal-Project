@@ -1,0 +1,34 @@
+% MTEX ODF
+% crystal symmetry: "m-3m"
+% specimen symmetry: "1"
+%
+%% uniform component
+% weight: 0.50000
+%
+%% fibre component
+% weight: 0.05000
+% kernel: de la Vallee Poussin, halfwidth 10°
+% fibre h: (100)
+% fibre r: 1,0,0
+%
+%% fibre component
+% weight: 0.05000
+% kernel: de la Vallee Poussin, halfwidth 10°
+% fibre h: (010)
+% fibre r: 0,1,0
+%
+%% fibre component
+% weight: 0.05000
+% kernel: de la Vallee Poussin, halfwidth 10°
+% fibre h: (001)
+% fibre r: 0,0,1
+%
+%% radial component:
+% kernel: de la Vallee Poussin, halfwidth 15°
+% phi1    Phi     phi2    weight
+0.00000 45.00000 0.00000 1.00000
+%
+%% radial component:
+% kernel: de la Vallee Poussin, halfwidth 25°
+% phi1    Phi     phi2    weight
+90.00000 65.00000 270.00000 1.00000

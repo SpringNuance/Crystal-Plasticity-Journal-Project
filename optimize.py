@@ -7,7 +7,12 @@
 
 def main():
 
-    runInitialSimulations()
+    ####################################################
+    # Step 0: Generating universal initial simulations #
+    ####################################################
+
+    initial_simulations.main()
+
     (initial_length, iteration_length, exp_curves, iterationPath, 
     combined_trueCurves, combined_processCurves, combined_interpolateCurves,  
     reverse_combined_trueCurves,  reverse_combined_processCurves,  reverse_combined_interpolateCurves,  
@@ -22,39 +27,6 @@ def main():
     messages = []
     messages.append(70 * "*" + "\n")
     messages.append(f"Step 2: Train the regressors for all loadings with the initial simulations of curve {CPLaw}{curveIndex}\n\n")
-
-    # The ANN regressors for each loading condition
-    regressors = {}
-    # The regularization scaler for each loading condition
-    scalers = {}
-    # ANN model selection from smallest test error 
-    numberOfHiddenLayers = 2
-    hiddenNodesFormula = "formula1"
-    ANNOptimizer = "Adam"
-    L2_regularization = 0.5
-    learning_rate = 0.05
-    
-    loading_epochs = {
-        "PH": {
-            "linear_uniaxial_RD": 2200, 
-            "nonlinear_biaxial_RD": 3200, 
-            "nonlinear_biaxial_TD": 2200,     
-            "nonlinear_planestrain_RD": 3600,     
-            "nonlinear_planestrain_TD": 3000,     
-            "nonlinear_uniaxial_RD": 3400, 
-            "nonlinear_uniaxial_TD": 2000
-        },
-        "DB":{
-            "linear_uniaxial_RD": 2400, 
-            "nonlinear_biaxial_RD": 2400, 
-            "nonlinear_biaxial_TD": 2400,     
-            "nonlinear_planestrain_RD": 2400,     
-            "nonlinear_planestrain_TD": 2400,     
-            "nonlinear_uniaxial_RD": 2400, 
-            "nonlinear_uniaxial_TD": 2400
-        }
-    }
-
     messages.append(f"ANN model: (parameters) -> (stress values at interpolating strain points)\n")
     
     stringMessage = "ANN configuration:\n"
@@ -67,6 +39,11 @@ def main():
     logTable.add_row(["ANN Optimizer", ANNOptimizer])
     logTable.add_row(["Learning rate", learning_rate])
     logTable.add_row(["L2 regularization term", L2_regularization])
+
+    # The ANN regressors for each loading condition
+    regressors = {}
+    # The regularization scaler for each loading condition
+    scalers = {}
 
     for loading in loadings:
         logTable.add_row([f"Epochs of {loading}", loading_epochs[CPLaw][loading]])
@@ -162,46 +139,10 @@ def main():
     smallNonlinearHardeningDev = smallNonlinearHardeningDevGlobal
 
     printList(messages, curveIndex)
-
-    info = {
-        'param_info': param_infos[curveIndex],
-        'CPLaw': CPLaw,
-        'server': server,
-        'curveIndex': curveIndex,
-        'initialSims': initialSims,
-        'projectPath': projectPath,
-        'optimizerName': optimizerName,
-        'material': material,
-        'method': method,
-        'searchingSpace': searchingSpace,
-        'roundContinuousDecimals': roundContinuousDecimals,
-        'loadings': loadings
-    }
     
     sim = SIM(info)
     sim.fileIndex = iteration_length 
 
-    info = {
-        "param_info": param_infos[curveIndex],
-        "param_info_GA_discrete": param_infos_GA_discrete[curveIndex],
-        "param_info_GA_continuous": param_infos_GA_continuous[curveIndex],
-        "param_info_BO": param_infos_BO[curveIndex],
-        "param_infos_PSO_low": param_infos_PSO_low[curveIndex],
-        "param_infos_PSO_high": param_infos_PSO_high[curveIndex],
-        'loadings': loadings,
-        "material": material,
-        "CPLaw": CPLaw,
-        "curveIndex": curveIndex,
-        "optimizerName": optimizerName,
-        "exp_curves": exp_curves,
-        "weightsYielding": weightsYielding,
-        "weightsHardening": weightsHardening,
-        "weightsLoading": weightsLoading,
-        "regressors": regressors,
-        "scalers": scalers,
-        "searchingSpace": searchingSpace,   
-        "roundContinuousDecimals": roundContinuousDecimals,
-    }
     
     if optimizerName == "NSGA":
         fullOptimizerName = "Non sorting genetic Algorithm"
@@ -263,7 +204,7 @@ def main():
             logTable.field_names = ["Parameter", "Value"]
             for param in stage_curves['parameters_dict']:
                 paramValue = stage_curves['parameters_dict'][param]
-                exponent = param_infos[curveIndex][param]['exponent'] if param_infos[curveIndex][param]['exponent'] != "e0" else ""
+                exponent = general_param_info[param]['exponent'] if general_param_info[param]['exponent'] != "e0" else ""
                 unit = paramsUnit[CPLaw][param]
                 paramString = f"{paramValue}"
                 if exponent != "":
@@ -298,7 +239,7 @@ def main():
                 for param in stage_curves['parameters_dict']:
                     paramValue = stage_curves['parameters_dict'][param]
                     target =  "(target)" if param in optimize_params[stageNumber] else ""
-                    exponent = param_infos[curveIndex][param]['exponent'] if param_infos[curveIndex][param]['exponent'] != "e0" else ""
+                    exponent = general_param_info[param]['exponent'] if general_param_info[param]['exponent'] != "e0" else ""
                     unit = paramsUnit[CPLaw][param]
                     paramString = f"{paramValue}"
                     if exponent != "":
@@ -390,7 +331,7 @@ def main():
                             for param in bestParams['solution_dict']:
                                 paramValue = bestParams['solution_dict'][param]
                                 target =  "(target)" if param in optimize_params[stageNumber] else ""
-                                exponent = param_infos[curveIndex][param]['exponent'] if param_infos[curveIndex][param]['exponent'] != "e0" else ""
+                                exponent = general_param_info[param]['exponent'] if general_param_info[param]['exponent'] != "e0" else ""
                                 unit = paramsUnit[CPLaw][param]
                                 logTable.add_row([param, f"{paramValue}{exponent} {unit} {target}"])
 
@@ -467,7 +408,7 @@ def main():
                         for param in bestParams['solution_dict']:
                             paramValue = bestParams['solution_dict'][param]
                             target =  "(target)" if param in optimize_params[stageNumber] else ""
-                            exponent = param_infos[curveIndex][param]['exponent'] if param_infos[curveIndex][param]['exponent'] != "e0" else ""
+                            exponent = general_param_info[param]['exponent'] if general_param_info[param]['exponent'] != "e0" else ""
                             unit = paramsUnit[CPLaw][param]
                             paramString = f"{paramValue}"
                             if exponent != "":
@@ -689,7 +630,7 @@ def main():
                 for param in stage_curves['parameters_dict']:
                     paramValue = stage_curves['parameters_dict'][param]
                     target =  "(target)" if param in optimize_params[stageNumber] else ""
-                    exponent = param_infos[curveIndex][param]['exponent'] if param_infos[curveIndex][param]['exponent'] != "e0" else ""
+                    exponent = general_param_info[param]['exponent'] if general_param_info[param]['exponent'] != "e0" else ""
                     unit = paramsUnit[CPLaw][param]
                     paramString = f"{paramValue}"
                     if exponent != "":
@@ -723,7 +664,7 @@ def main():
 
     for param in stage4_curves['parameters_dict']:
         paramValue = stage4_curves['parameters_dict'][param]
-        exponent = param_infos[curveIndex][param]['exponent'] if param_infos[curveIndex][param]['exponent'] != "e0" else ""
+        exponent = general_param_info[param]['exponent'] if general_param_info[param]['exponent'] != "e0" else ""
         unit = paramsUnit[CPLaw][param]
         paramString = f"{paramValue}"
         if exponent != "":
@@ -753,10 +694,10 @@ if __name__ == '__main__':
     # External libraries
     import os
     import numpy as np
-    from threading import Lock
-    from modules.SIM import *
-    from modules.initial_simulations import * 
-    from modules.prepare_data import * 
+    import initial_simulations  
+    import prepare_data
+    from modules.SIM_damask2 import *
+    from prepare_data import * 
     from modules.preprocessing import *
     from modules.stoploss import *
     from modules.helper import *

@@ -1,0 +1,132 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <title>Grain Tutorial ( Toolbox)
+         
+      </title>
+      <!-- DOCNAME:  Toolbox -->
+      <meta name="chunktype" content="refpage">
+      <!-- CHUNKNAME: GrainTutorial -->
+      <!-- HEADSTUFF: GrainTutorial -->
+      <!-- HEADSTUFF -->
+      <meta name="refentity" content="method:GrainTutorial">
+      <meta http-equiv="Content-Script-Type" content="text/javascript">
+      <meta name="toctype" content="fcn">
+      <link rel="stylesheet" href="style.css"><script language="JavaScript" src="docscripts.js"></script></head>
+   <body><a name="top_of_page"></a><div>
+         <table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+               <td valign="baseline"></td>
+            </tr>
+         </table>
+         <p style="font-size:1px;"></p>
+      </div>
+      <div class="content">
+         <h1 class="refname">Grain Tutorial</h1>
+         <div class="subheading"></div>
+         <p>The following script is a quick guide through the grain reconstruction capabilities of MTEX. It uses the same data set as
+            in the corresponding publication <a href="https://www.researchgate.net/publication/51806709_Grain_detection_from_2d_and_3d_EBSD_data-Specification_of_the_MTEX_algorithm">Grain detection from 2d and 3d EBSD data</a>. Data courtesy of Daniel Rutte and Bret Hacker, Stanford.
+         </p><pre class="codeinput">mtexdata <span class="string">mylonite</span>
+
+<span class="comment">% plot a phase map</span>
+plot(ebsd)</pre><pre class="codeoutput"> saving data to /home/hielscher/mtex/master/data/mylonite.mat
+ 
+ebsd = EBSD
+ 
+ Phase  Orientations     Mineral         Color  Symmetry  Crystal reference frame
+     1    3444 (28%)    Andesina  LightSkyBlue        -1              X||a*, Z||c
+     2    3893 (31%)      Quartz  DarkSeaGreen      -3m1       X||a*, Y||b, Z||c*
+     3    368 (2.9%)     Biotite     Goldenrod     2/m11       X||a*, Y||b*, Z||c
+     4    4781 (38%)  Orthoclase    LightCoral     12/m1       X||a*, Y||b*, Z||c
+ 
+ Properties: x, y
+ Scan unit : um
+ 
+</pre><img src="GrainTutorial_01.png"> <p>The phase map shows a multi-phase rock specimen with Andesina, Quartz, Biotite and Orthoclase. Lets restrict it to a smaller
+            region of interest. The rectangle is defined by [xmin, ymin, xmax-xmin, ymax-ymin].
+         </p><pre class="codeinput">region = [19000 1500 4000 1500];
+<span class="comment">% overlay the selected region on the phase map</span>
+rectangle(<span class="string">'position'</span>,region,<span class="string">'edgecolor'</span>,<span class="string">'k'</span>,<span class="string">'linewidth'</span>,2)</pre><img src="GrainTutorial_02.png"> <p>Now copy the EBSD data within the selected rectangle to a new variable</p><pre class="codeinput">ebsd_region = ebsd(inpolygon(ebsd,region))</pre><pre class="codeoutput"> 
+ebsd_region = EBSD
+ 
+ Phase  Orientations     Mineral         Color  Symmetry  Crystal reference frame
+     1     578 (20%)    Andesina  LightSkyBlue        -1              X||a*, Z||c
+     2    1144 (40%)      Quartz  DarkSeaGreen      -3m1       X||a*, Y||b, Z||c*
+     3       58 (2%)     Biotite     Goldenrod     2/m11       X||a*, Y||b*, Z||c
+     4    1066 (37%)  Orthoclase    LightCoral     12/m1       X||a*, Y||b*, Z||c
+ 
+ Properties: x, y
+ Scan unit : um
+ 
+</pre><h2>Grain Reconstruction<a name="4"> </a></h2>
+         <p>Next we reconstruct the grains and grain boundaries in the region of interest, using a 15 degree orientation change threshold.</p><pre class="codeinput">grains = calcGrains(ebsd_region,<span class="string">'angle'</span>,15*degree)
+
+<span class="comment">% plot a phase map of the region of interest</span>
+plot(ebsd_region)
+
+<span class="comment">% overlay the grain boundaries</span>
+hold <span class="string">on</span>
+plot(grains.boundary,<span class="string">'color'</span>,<span class="string">'k'</span>,<span class="string">'linewidth'</span>,1.5)
+hold <span class="string">off</span></pre><pre class="codeoutput"> 
+grains = grain2d
+ 
+ Phase  Grains  Pixels     Mineral  Symmetry  Crystal reference frame
+     1     371     578    Andesina        -1              X||a*, Z||c
+     2     189    1144      Quartz      -3m1       X||a*, Y||b, Z||c*
+     3      55      58     Biotite     2/m11       X||a*, Y||b*, Z||c
+     4     380    1066  Orthoclase     12/m1       X||a*, Y||b*, Z||c
+ 
+ boundary segments: 4424
+ inner boundary segments: 1
+ triple points: 1333
+ 
+ Properties: meanRotation, GOS
+ 
+</pre><img src="GrainTutorial_03.png"> <p>We may also visualize the different quarz orientations together with the grain boundaries.</p><pre class="codeinput"><span class="comment">% plot a phase map of three of the phases based on the grains data</span>
+plot(grains({<span class="string">'Andesina'</span>,<span class="string">'Biotite'</span>,<span class="string">'Orthoclase'</span>}),<span class="string">'FaceAlpha'</span>,0.4)
+
+hold <span class="string">on</span>
+<span class="comment">% add the quarz orientations as ipf map based on EBSD data</span>
+plot(ebsd_region(<span class="string">'Quartz'</span>),ebsd_region(<span class="string">'Quartz'</span>).orientations)
+
+<span class="comment">% plot grain boundaries so that those in the Quartz are shown</span>
+plot(grains.boundary,<span class="string">'color'</span>,<span class="string">'black'</span>);
+legend <span class="string">off</span>
+hold <span class="string">off</span></pre><img src="GrainTutorial_04.png"> <p>For the map created, most of the phases are coloured based on where they exist, while only the Quartz phase is colored according
+            to the orientation. The quartz orientations are colured using the following ipf color key
+         </p><pre class="codeinput">close <span class="string">all</span>
+ipfKey = ipfColorKey(ebsd_region(<span class="string">'Quartz'</span>));
+plot(ipfKey)</pre><img src="GrainTutorial_05.png"> <p>Alternatively, we may colorize each quarz grain according to its mean orientation.  Again, the other phases are colured based
+            on where they exist.
+         </p><pre class="codeinput">plot(grains({<span class="string">'Andesina'</span>,<span class="string">'Biotite'</span>,<span class="string">'Orthoclase'</span>}),<span class="string">'FaceAlpha'</span>,0.4)
+hold <span class="string">on</span>
+plot(grains(<span class="string">'Quartz'</span>),grains(<span class="string">'Quartz'</span>).meanOrientation)
+legend <span class="string">off</span></pre><img src="GrainTutorial_06.png"> <h2>Highlight specific boundaries<a name="8"> </a></h2>
+         <p>We can create a phase map with certain grain boundaries highlighted.  In this case, we highlight where adjacent grains of
+            Andesina and Orthoclase have a misorientation with rotational axis close to the c-axis.
+         </p><pre class="codeinput">close <span class="string">all</span>
+<span class="comment">% copy all boundaries between Andesina Orthoclase to a new variable</span>
+AOboundary = grains.boundary(<span class="string">'Andesina'</span>,<span class="string">'Orthoclase'</span>);
+<span class="comment">% copy the misorientation angle of this boundary in radians to a new variable.</span>
+angle = AOboundary.misorientation.angle;
+
+plot(grains,<span class="string">'FaceAlpha'</span>,0.4)
+hold <span class="string">on</span>
+<span class="comment">% highlight boundaries where the angle between the Andesina and Orthoclase phase is over 160 degrees</span>
+plot(AOboundary(angle&gt;160*degree),<span class="string">'linewidth'</span>,2,<span class="string">'linecolor'</span>,<span class="string">'red'</span>)
+hold <span class="string">off</span></pre><img src="GrainTutorial_07.png"> <p>We can also represent the angular misorientation data between these two phases as a histogram.</p><pre class="codeinput">figure;histogram(angle./degree)
+xlabel(<span class="string">'angle in degrees of boundary segment'</span>)
+ylabel(<span class="string">'count of boundary segments'</span>)
+title(<span class="string">'angular relationships between Andesina and Orthoclase'</span>)</pre><img src="GrainTutorial_08.png"> <p style="font-size:1px;"></p>
+         <table class="footer" border="0" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+               <td valign="baseline" align="right"></td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

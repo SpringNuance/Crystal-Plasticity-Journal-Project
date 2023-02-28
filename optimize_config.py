@@ -28,6 +28,31 @@ CPLaw = dataConfig["CPLaw"]
 
 optimizerName = dataConfig["optimizerName"] 
 
+# The 8 types of loadings: 2 linear loadings and 6 nonlinear loadings
+loadings = [
+            #"linear_uniaxial_RD", 
+            "linear_uniaxial_TD",
+            #"nonlinear_biaxial_RD", 
+            #"nonlinear_biaxial_TD",     
+            #"nonlinear_planestrain_RD",     
+            #"nonlinear_planestrain_TD",     
+            #"nonlinear_uniaxial_RD", 
+            #"nonlinear_uniaxial_TD"
+            ]
+
+# loadings = [
+#             "linear_uniaxial_RD", 
+#             #"linear_uniaxial_TD",
+#             "nonlinear_biaxial_RD", 
+#             "nonlinear_biaxial_TD",     
+#             "nonlinear_planestrain_RD",     
+#             "nonlinear_planestrain_TD",     
+#             "nonlinear_uniaxial_RD", 
+#             "nonlinear_uniaxial_TD"
+#             ]
+
+exampleLoading = loadings[0]
+
 yieldingPoints = {
     "PH": 
     {
@@ -65,8 +90,6 @@ method = dataConfig["method"]
 curveIndex = dataConfig["curveIndex"] 
 
 searchingSpace = dataConfig["searchingSpace"]  
-
-searchingType = dataConfig["searchingType"]
  
 roundContinuousDecimals = dataConfig["roundContinuousDecimals"]  
 
@@ -165,16 +188,7 @@ paramsUnit = {
     },
 }
 
-# The 8 types of loadings: 2 linear loadings and 6 nonlinear loadings
-loadings = ["linear_uniaxial_RD", 
-            #"linear_uniaxial_TD",
-            "nonlinear_biaxial_RD", 
-            "nonlinear_biaxial_TD",     
-            "nonlinear_planestrain_RD",     
-            "nonlinear_planestrain_TD",     
-            "nonlinear_uniaxial_RD", 
-            "nonlinear_uniaxial_TD"]
-example_loading = "linear_uniaxial_RD"
+
 # The project path folder
 projectPath = os.getcwd()
 
@@ -187,7 +201,7 @@ if CPLaw == "PH":
 elif CPLaw == "DB":
     law = "dislocation-based law"
 
-target_curves = f"{CPLaw}{curveIndex}{curveIndex}"
+target_curve = f"{CPLaw}{curveIndex}"
 
 linearYieldingDevGlobalPercent = f"{linearYieldingDevGlobal}%"
 
@@ -211,11 +225,10 @@ logTable.add_row(["Server", server])
 logTable.add_row(["Initial simulation number", initialSims])
 logTable.add_row(["Initial simulation method", method])
 logTable.add_row(["Searching space", searchingSpace])
-logTable.add_row(["Searching type", searchingType])
 logTable.add_row(["Material", material])
 logTable.add_row(["CP Law", CPLaw])
 logTable.add_row(["Optimizer", optimizerName])
-logTable.add_row(["Target curves", target_curves])
+logTable.add_row(["Target curves", target_curve])
 logTable.add_row(["Rounding decimals", roundContinuousDecimals])
 logTable.add_row(["Linear yielding dev", linearYieldingDevGlobalPercent])
 logTable.add_row(["Large linear hardening dev", largeLinearHardeningDevGlobalPercent])
@@ -224,7 +237,7 @@ logTable.add_row(["Large nonlinear hardening dev", largeNonlinearHardeningDevGlo
 logTable.add_row(["Small nonlinear hardening dev", smallNonlinearHardeningDevGlobalPercent])
 
 configMessages.append(logTable.get_string())
-configMessages.append("\n\n")
+configMessages.append("\n")
 
 #########################################################
 # Creating necessary directories for the configurations #
@@ -303,9 +316,10 @@ checkCreate(f"{path}/{CPLaw}/param_info")
 
 
 # Loading the parameter information
-#                                                                                    numOfColumns, startingColumn, spacing, nrows
-getParamRanges(material, CPLaw, curveIndex, searchingSpace, searchingType, roundContinuousDecimals, 3, 11, 1)
+#                                                                           
+getParamRanges(material, CPLaw, curveIndex, searchingSpace, roundContinuousDecimals)
 general_param_info = loadGeneralParam(material, CPLaw)
+
 # print(general_param_info)
 # param_infos_GA_discrete = param_infos_GA_discrete_func(param_infos) # For GA discrete
 # param_infos_GA_continuous = param_infos_GA_continuous_func(param_infos) # For GA continuous
@@ -327,7 +341,8 @@ info = {
     'method': method,
     'searchingSpace': searchingSpace,
     'roundContinuousDecimals': roundContinuousDecimals,
-    'loadings': loadings
+    'loadings': loadings,
+    'exampleLoading': exampleLoading
 }
 
 printList(configMessages)
@@ -343,3 +358,31 @@ assert smallNonlinearHardeningDevGlobal > smallLinearHardeningDevGlobal, "smallN
 
 print("Generating necessary directories\n")
 print(f"The path to your main project folder is\n", f"{projectPath}\n\n")
+
+# ANN model selection from smallest test error 
+numberOfHiddenLayers = 2
+hiddenNodesFormula = "formula1"
+ANNOptimizer = "Adam"
+L2_regularization = 0.5
+learning_rate = 0.05
+
+loading_epochs = {
+    "PH": {
+        "linear_uniaxial_RD": 2200, 
+        "nonlinear_biaxial_RD": 3200, 
+        "nonlinear_biaxial_TD": 2200,     
+        "nonlinear_planestrain_RD": 3600,     
+        "nonlinear_planestrain_TD": 3000,     
+        "nonlinear_uniaxial_RD": 3400, 
+        "nonlinear_uniaxial_TD": 2000
+    },
+    "DB":{
+        "linear_uniaxial_RD": 2400, 
+        "nonlinear_biaxial_RD": 2400, 
+        "nonlinear_biaxial_TD": 2400,     
+        "nonlinear_planestrain_RD": 2400,     
+        "nonlinear_planestrain_TD": 2400,     
+        "nonlinear_uniaxial_RD": 2400, 
+        "nonlinear_uniaxial_TD": 2400
+    }
+}

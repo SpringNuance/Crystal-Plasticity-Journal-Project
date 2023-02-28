@@ -1,0 +1,114 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <title>Cluster demo ( Toolbox)
+         
+      </title>
+      <!-- DOCNAME:  Toolbox -->
+      <meta name="chunktype" content="refpage">
+      <!-- CHUNKNAME: ClusterDemo -->
+      <!-- HEADSTUFF: ClusterDemo -->
+      <!-- HEADSTUFF -->
+      <meta name="refentity" content="method:ClusterDemo">
+      <meta http-equiv="Content-Script-Type" content="text/javascript">
+      <meta name="toctype" content="fcn">
+      <link rel="stylesheet" href="style.css"><script language="JavaScript" src="docscripts.js"></script></head>
+   <body><a name="top_of_page"></a><div>
+         <table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+               <td valign="baseline"></td>
+            </tr>
+         </table>
+         <p style="font-size:1px;"></p>
+      </div>
+      <div class="content">
+         <h1 class="refname">Cluster demo</h1>
+         <div class="subheading">
+            <p>This code demonstrates how the clustering algorithm can be used to assign vector3d and crystal directions to groups by proximity.</p>
+         </div>
+         <p>define an octohedral crystal symmetry</p><pre class="codeinput">cs  = crystalSymmetry(<span class="string">'432'</span>);
+
+<span class="comment">% define a radially symmetric ODF with two randomly selected peaks.</span>
+odf = unimodalODF(orientation.rand(2,cs),<span class="string">'halfwidth'</span>,5*degree);
+
+
+<span class="comment">% view the odf</span>
+plotPDF(odf,Miller(1,0,0,odf.CS),<span class="string">'contour'</span>,<span class="string">'linewidth'</span>,2);
+
+<span class="comment">% generate 10k orientations from this randomly defined ODF function</span>
+ori = odf.discreteSample(10000);
+
+<span class="comment">% convert the orientations to vector3D</span>
+r = ori * Miller(1,0,0,odf.CS);</pre><img src="ClusterDemo_01.png"> <p>assign each vector3d to one of twelve clusters, and calculate the vector3D located at the center of each cluster</p><pre class="codeinput">[cId,center] = calcCluster(r,<span class="string">'numCluster'</span>,12);
+
+<span class="comment">% plot the clusters, sorted by colour</span>
+figure;
+plot(r,ind2color(cId))
+
+<span class="comment">% annotate all the cluster centers, on all figures.</span>
+annotate(center,<span class="string">'add2all'</span>);</pre><img src="ClusterDemo_02.png"> <p>Note that the upper and lower hemisphere plots are versions of each other, reflected horizontally plus vertically.  This means
+            that the underlying data has antipodal symmetry, contributing equally to both hemispheres.  Let's include that in the cluster
+            sorting.
+         </p>
+         <p>repeat the calculation after changing all the vector3d to be antipodal</p><pre class="codeinput">r.antipodal = true;
+
+<span class="comment">% repeat the calculation assigning vector3D to clusters.  Due to the</span>
+<span class="comment">% increase in symmetry, there are only six clusters now.</span>
+[cId,center] = calcCluster(r,<span class="string">'numCluster'</span>,6);
+
+<span class="comment">% plot the vectors.  Note that we no longer get an upper and lower hemisphere plot; the antipodal symmetry tells MTEX they are equivilent and so one sufficient to represent the data.</span>
+figure;plot(r,ind2color(cId))
+
+<span class="comment">% annotate the cluster centers.</span>
+annotate(center,<span class="string">'add2all'</span>)</pre><img src="ClusterDemo_03.png"> <p>pick a vector3d, and use that to convert the 10k random orientations previously generated into crystal directions.</p><pre class="codeinput">h = ori \ vector3d(1,1,0);
+
+<span class="comment">% assign the crystal directions to two clusters</span>
+[cId,center] = calcCluster(h,<span class="string">'numCluster'</span>,2);
+
+<span class="comment">% plot the crystal symmetry data on appropiate fundamental sector</span>
+plot(h.project2FundamentalRegion,ind2color(cId),<span class="string">'fundamentalSector'</span>)
+
+<span class="comment">% annote the cluster centers</span>
+annotate(center,<span class="string">'add2all'</span>)</pre><img src="ClusterDemo_04.png"> <p>just as we calculated clusters for vector3D and crystal directions, we're now going to do so for orientations</p><pre class="codeinput">[cId,center] = calcCluster(ori,<span class="string">'numCluster'</span>,2,<span class="string">'method'</span>,<span class="string">'hierarchical'</span>);
+
+<span class="comment">% create a pole figure of the orientations coloured by the cluster they</span>
+<span class="comment">% belong to.</span>
+plotPDF(ori,ind2color(cId),Miller(1,0,0,cs),<span class="string">'all'</span>)</pre><img src="ClusterDemo_05.png"> <p>If you have the statistics toolbox, you can make some calculations about the spread of points assigned to each cluster.</p><pre class="codeinput"><span class="comment">% compute the full distance matrix between all combinations of vector3D</span>
+d = angle_outer(r,r);
+<span class="comment">% convert all small values to zero to simplify later calculations</span>
+d(d&lt;0.01) = 0;
+<span class="comment">%d = d(triu(true(size(d)),1));</span>
+
+<span class="comment">% use the statistic toolbox</span>
+<span class="keyword">try</span>
+  d = squareform(d);
+  z = linkage(d,<span class="string">'single'</span>);
+
+  <span class="comment">%cId = cluster(z,'cutoff',30*degree);</span>
+  cId = cluster(z,<span class="string">'maxclust'</span>,12);
+
+  plotCluster(r,cId)
+<span class="keyword">catch</span>
+  warning(<span class="string">'Statistics Toolbox not installed!'</span>)
+<span class="keyword">end</span></pre><pre class="codeoutput">Warning: Statistics Toolbox not installed! 
+</pre><pre class="codeinput"><span class="keyword">function</span> plotCluster(r,cId,varargin)
+
+scatter(r(cId==1),<span class="string">'MarkerFaceColor'</span>,ind2color(1),varargin{:})
+hold <span class="string">on</span>
+<span class="keyword">for</span> i = 2:max(cId)
+  scatter(r(cId==i),<span class="string">'add2all'</span>,<span class="string">'MarkerFaceColor'</span>,ind2color(i),varargin{:})
+<span class="keyword">end</span>
+hold <span class="string">off</span>
+<span class="keyword">end</span></pre><p style="font-size:1px;"></p>
+         <table class="footer" border="0" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+               <td valign="baseline" align="right"></td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

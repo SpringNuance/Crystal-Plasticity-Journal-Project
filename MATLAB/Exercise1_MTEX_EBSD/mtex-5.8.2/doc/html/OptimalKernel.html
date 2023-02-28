@@ -1,0 +1,124 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html xmlns:mwsh="http://www.mathworks.com/namespace/mcode/v1/syntaxhighlight.dtd">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <title>Optimal Kernel Selection ( Toolbox)
+         
+      </title>
+      <!-- DOCNAME:  Toolbox -->
+      <meta name="chunktype" content="refpage">
+      <!-- CHUNKNAME: OptimalKernel -->
+      <!-- HEADSTUFF: OptimalKernel -->
+      <!-- HEADSTUFF -->
+      <meta name="refentity" content="method:OptimalKernel">
+      <meta http-equiv="Content-Script-Type" content="text/javascript">
+      <meta name="toctype" content="fcn">
+      <link rel="stylesheet" href="style.css"><script language="JavaScript" src="docscripts.js"></script></head>
+   <body><a name="top_of_page"></a><div>
+         <table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+               <td valign="baseline"></td>
+            </tr>
+         </table>
+         <p style="font-size:1px;"></p>
+      </div>
+      <div class="content">
+         <h1 class="refname">Optimal Kernel Selection</h1>
+         <div class="subheading"></div>
+         <p>In the section <a href="DensityEstimation.html">density estimation</a> we have seen that the correct choice of the kernel halfwidth is essential for creating a good match between the true density
+            function and the reconstructed density function. If the halfwidth is set too small the reconstructed density function is usually
+            oscillating and the indiviudual sampling points are visible as sharp peaks. If the halfwidth is too large the resulting density
+            function is usually too smooth and does not reproduce the features of the original density function.
+         </p>
+         <p>Finding an optimal kernel halfwidth is a hard problem as the optimal kernel halfwidth depends not only on the number of sampling
+            points but also on the smoothness of the true but unknown density function. MTEX offers several options set by flags during
+            the kernel calculation operation.  A very conserative choice for the kernel halfwidth that takes into account only the number
+            of sampling points is implemented in MTEX with the flag <tt>'magicRule'</tt>. The flag <tt>'RuleOfThumb'</tt> considers both the number of sampling points and the variance of the sampling points as an estimate of the smoothness of
+            the true density function. The most advanced (and default) method for estimating the optimal kernel halfwidth is <a href="orientation.KLCV.html">Kullback Leibler cross validation</a>. This method tests different kernel halfwidths on a subset of the random sample and selects the halfwidth which best reproduces
+            the ommited points of the random sample.
+         </p>
+         <p>In order to demonstrate this functionality let's start with the following orientation density function</p><pre class="codeinput"><span class="comment">% Define trigonal crystal symmetry using Enantiomorphic Point Group notation</span>
+cs = crystalSymmetry(<span class="string">'32'</span>);
+
+<span class="comment">% Build a density function by combining a uniform texture with two pre-defined texture components</span>
+odf = 0.25*uniformODF(cs) + 0.25*unimodalODF(orientation.brass(cs)) + <span class="keyword">...</span>
+  0.5*fibreODF(fibre.alpha(cs),<span class="string">'halfwidth'</span>,10*degree);
+
+<span class="comment">% plot the density function as six sigma sections</span>
+plot(odf,<span class="string">'sections'</span>,6,<span class="string">'silent'</span>,<span class="string">'sigma'</span>)
+mtexColorbar</pre><pre class="codeoutput">Warning: Miller indece are not orthogonal. Maximum deviation is 27
+degree 
+</pre><img src="OptimalKernel_01.png"> <p>and compute <img src="OptimalKernel_eq01183091455691360782.png">  random orientations representing this density function using the command <tt><a href="orientation.discreteSample.html">discreteSample</a></tt></p><pre class="codeinput">ori = odf.discreteSample(10000)</pre><pre class="codeoutput"> 
+ori = orientation (321 &#8594; xyz)
+  size: 10000 x 1
+</pre><p>Next we estimate the optimal <a href="ODFShapes.html">kernel function</a> using the command <tt><a href="orientation.calcKernel.html">calcKernel</a></tt> with the default settings.
+         </p><pre class="codeinput">psi  = calcKernel(ori)</pre><pre class="codeoutput"> 
+psi = deLaValleePoussinKernel
+  bandwidth: 43
+  halfwidth: 5.7&deg;
+ 
+</pre><p>This kernel can now be used to reconstruct the original ODF from the sampled points using the command <a href="DensityEsimation.html">density estimation</a></p><pre class="codeinput">odf_rec = calcDensity(ori,<span class="string">'kernel'</span>,psi)
+
+<span class="comment">% plot the reconstructed ODF and compare it to the plot of the original function.  The results are similar but not identical.</span>
+figure;plot(odf_rec,<span class="string">'sections'</span>,6,<span class="string">'silent'</span>,<span class="string">'sigma'</span>)
+mtexColorbar</pre><pre class="codeoutput"> 
+odf_rec = ODF (321 &#8594; xyz)
+ 
+  Harmonic portion:
+    degree: 43
+    weight: 1
+ 
+</pre><img src="OptimalKernel_02.png"> <h2>Exploration of the relationship between estimation error and number of single orientations<a name="5"> </a></h2>
+         <p>In this section we want to compare the different methods for estimating the optimal kernel halfwidth. To this end we simulate
+            10, 100, ..., 1000000 single orientations from the model ODF <tt>odf</tt>, compute optimal kernels according to the <tt>'magicRule'</tt>, the <tt>'RuleOfThumb'</tt> and <a href="orientation.KLCV.html">Kullback Leibler cross validation</a> and then compute the fit between the reconstructed <tt>odf_rec</tt> and the original <tt>odf</tt>.
+         </p><pre class="codeinput"><span class="comment">% define a variable to hold the calculated error values</span>
+e = [];
+<span class="keyword">for</span> i = 1:6
+
+  <span class="comment">% calculate a sample of orientations from the model ODF</span>
+  ori = calcOrientations(odf,10^i,<span class="string">'silent'</span>);
+
+  <span class="comment">% calculate the kernel using the function defaults, reconstruct the odf, and calculate error between this and the original ODF</span>
+  psi1 = calcKernel(ori,<span class="string">'SamplingSize'</span>,10000,<span class="string">'silent'</span>);
+  odf_rec = calcDensity(ori,<span class="string">'kernel'</span>,psi1,<span class="string">'silent'</span>);
+  e(i,1) = calcError(odf_rec,odf,<span class="string">'resolution'</span>,2.5*degree);
+
+  <span class="comment">% calculate the kernel using the RuleOfThumb, reconstruct the odf, and calculate error between this and the original ODF</span>
+  psi2 = calcKernel(ori,<span class="string">'method'</span>,<span class="string">'RuleOfThumb'</span>,<span class="string">'silent'</span>);
+  odf_rec = calcDensity(ori,<span class="string">'kernel'</span>,psi2,<span class="string">'silent'</span>);
+  e(i,2) = calcError(odf_rec,odf,<span class="string">'resolution'</span>,2.5*degree);
+
+  <span class="comment">% calculate the kernel using the magicRule, reconstruct the odf, and calculate error between this and the original ODF</span>
+  psi3 = calcKernel(ori,<span class="string">'method'</span>,<span class="string">'magicRule'</span>,<span class="string">'silent'</span>);
+  odf_rec = calcDensity(ori,<span class="string">'kernel'</span>,psi3,<span class="string">'silent'</span>);
+  e(i,3) = calcError(odf_rec,odf,<span class="string">'resolution'</span>,2.5*degree);
+
+  <span class="comment">% generate text showing the kernel size calculated with each method in each loop</span>
+  disp([<span class="string">'RuleOfThumb: '</span> int2str(psi2.halfwidth/degree) mtexdegchar <span class="keyword">...</span>
+    <span class="string">' KLCV: '</span> int2str(psi1.halfwidth/degree) mtexdegchar <span class="keyword">...</span>
+    <span class="string">' magicRule: '</span> int2str(psi3.halfwidth/degree) mtexdegchar <span class="keyword">...</span>
+    ]);
+
+<span class="keyword">end</span></pre><pre class="codeoutput">RuleOfThumb: 69&deg; KLCV: 24&deg; magicRule: 31&deg;
+RuleOfThumb: 34&deg; KLCV: 12&deg; magicRule: 22&deg;
+RuleOfThumb: 18&deg; KLCV: 8&deg; magicRule: 16&deg;
+RuleOfThumb: 10&deg; KLCV: 6&deg; magicRule: 11&deg;
+RuleOfThumb: 8&deg; KLCV: 5&deg; magicRule: 8&deg;
+RuleOfThumb: 7&deg; KLCV: 4&deg; magicRule: 6&deg;
+</pre><p>Plot the error to the number of single orientations sampled from the original ODF.</p><pre class="codeinput">close <span class="string">all</span>;
+loglog(10.^(1:length(e)),e,<span class="string">'LineWidth'</span>,2)
+legend(<span class="string">'Default'</span>,<span class="string">'RuleOfThumb'</span>,<span class="string">'magicRule'</span>)
+xlabel(<span class="string">'Number of orientations (log scale)'</span>)
+ylabel(<span class="string">'Estimation Error in degrees'</span>)
+title(<span class="string">'Error between original ODF model and the reconstructed ODF'</span>,<span class="string">'FontWeight'</span>,<span class="string">'bold'</span>)</pre><img src="OptimalKernel_03.png"> <p style="font-size:1px;"></p>
+         <table class="footer" border="0" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+               <td valign="baseline" align="right"></td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

@@ -20,9 +20,9 @@
 ulimit -s unlimited 
 
 ### Enabling environments
-source /scratch/project_2004956/damask-2.0.3/damask-2.0.3/damask_env.txt
-source /scratch/project_2004956/damask-2.0.3/damask-2.0.3/env/DAMASK.sh
-PATH=$PATH:/scratch/project_2004956/damask-2.0.3/damask-2.0.3/bin:/scratch/project_2004956/damask-2.0.3/damask-2.0.3/processing/post
+source /projappl/project_2004956/damask2/damask_env.txt
+source /projappl/project_2004956/damask2/damask-2.0.3/env/DAMASK.sh
+PATH=$PATH:/projappl/project_2004956/damask2/damask-2.0.3/bin:/projappl/project_2004956/damask2/damask-2.0.3/processing/post
 
 ### Arguments from project code
 material=$1

@@ -47,9 +47,9 @@ def main_prepare(info):
     initial_loadings_trueCurves = {}
 
     for loading in loadings:
-        initial_loadings_trueCurves[loading] = np.load(f'results/{material}/{CPLaw}/universal/{loading}/initial_processCurves.npy', allow_pickle=True).tolist()
+        initial_loadings_trueCurves[loading] = np.load(f'results/{material}/{CPLaw}/universal/{loading}/initial_processCurves.npy', allow_pickle=True).tolist() 
         initial_loadings_processCurves[loading] = np.load(f'results/{material}/{CPLaw}/universal/{loading}/initial_trueCurves.npy', allow_pickle=True).tolist()
-    # print(list(initial_loadings_trueCurves[loading].keys())[0])
+    #print(list(initial_loadings_trueCurves[loading].keys())[0])
     # time.sleep(30)
     # Calculating average strain from initial simulations 
     average_initialStrains = {}
@@ -57,7 +57,7 @@ def main_prepare(info):
         average_initialStrains[loading] = np.array(list(map(lambda strainstress: strainstress["strain"], initial_loadings_processCurves[loading].values()))).mean(axis=0)
     
     # Producing all target curves npy file
-    getTargetCurves(material, CPLaw, curveIndex, loadings)
+    getTargetCurves(material, CPLaw, curveIndex, loadings, Pa=True)
 
     # Preparing the experimental curve of all loadings
     exp_curve = {}
@@ -71,6 +71,9 @@ def main_prepare(info):
         exp_trueCurve = np.load(f'targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}_true.npy', allow_pickle=True).tolist()
         exp_processCurve = np.load(f'targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}_process.npy', allow_pickle=True).tolist()
         interpolatedStrain = interpolatingStrain(average_initialStrains[loading], exp_processCurve["strain"], example_sim_stress, yieldingPoints[CPLaw][loading], loading)                 
+        #print(interpolatedStrain)
+        #print(exp_processCurve["strain"])
+        #print(exp_processCurve["stress"])
         interpolatedStress = interpolatingStress(exp_processCurve["strain"], exp_processCurve["stress"], interpolatedStrain, loading).reshape(-1)
         exp_interpolateCurve = {
             "strain": interpolatedStrain,
@@ -79,16 +82,16 @@ def main_prepare(info):
         exp_curve["true"][loading] = exp_trueCurve
         exp_curve["process"][loading] = exp_processCurve
         exp_curve["interpolate"][loading] = exp_interpolateCurve 
-        print(exp_curve["process"])
-        time.sleep(30)
+        #print(exp_curve["interpolate"][loading])
+
         np.save(f"targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}_interpolate.npy", exp_curve["interpolate"][loading])
-    
+
     np.save(f"targets/{material}/{CPLaw}/{CPLaw}{curveIndex}_curves.npy", exp_curve)
     print(f"Finished preparing all target curves\n\n")
     ##################################################################
 
   
-
+    # time.sleep(30)
     # Loading iteration curves
     iteration_loadings_trueCurves = {}
     iteration_loadings_processCurves = {}
@@ -177,9 +180,9 @@ def main_prepare(info):
     logTable.field_names = ["Loading", "Exp σ_yield ", "Allowed σ_yield sim range"]
     for loading in loadings:
         if loading.startswith("linear"):
-            targetYieldStress = '{:.3f}'.format(round(exp_curve["interpolate"][loading]['stress'][1], 3))
-            rangeSimYieldBelow = '{:.3f}'.format(round(exp_curve["interpolate"][loading]["stress"][1] * (1 - linearYieldingDev * 0.01), 3))  
-            rangeSimYieldAbove = '{:.3f}'.format(round(exp_curve["interpolate"][loading]['stress'][1] * (1 + linearYieldingDev * 0.01), 3))
+            targetYieldStress = '{:.3f}'.format(round(exp_curve["interpolate"][loading]['stress'][1], 3)) 
+            rangeSimYieldBelow = '{:.3f}'.format(round(exp_curve["interpolate"][loading]["stress"][1] * (1 - linearYieldingDev * 0.01), 3)) 
+            rangeSimYieldAbove = '{:.3f}'.format(round(exp_curve["interpolate"][loading]['stress'][1] * (1 + linearYieldingDev * 0.01), 3)) 
             logTable.add_row([loading, f"{targetYieldStress} MPa", f"[{rangeSimYieldBelow}, {rangeSimYieldAbove} MPa]"])
     
     stringMessage += logTable.get_string()
@@ -226,7 +229,7 @@ def main_prepare(info):
     printParametersClean(default_curves["parameters_tuple"], param_info, paramsUnit, CPLaw)
 
     print(f"The default parameters for the optimization of curve {CPLaw}{curveIndex}\n")
-    time.sleep(30)
+   
     np.save(f'{initialResultPath}/common/initial_loadings_trueCurves', initial_loadings_trueCurves) 
     np.save(f'{initialResultPath}/common/initial_loadings_processCurves', initial_loadings_processCurves)
     np.save(f'{initialResultPath}/common/initial_loadings_interpolateCurves', initial_loadings_interpolateCurves)

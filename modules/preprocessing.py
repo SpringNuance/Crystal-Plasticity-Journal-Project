@@ -79,11 +79,16 @@ def loadGeneralParam(material, CPLaw):
 # Obtain the target curves # 
 ############################
 
-def getTargetCurves(material, CPLaw, curveIndex, loadings):
+def getTargetCurves(material, CPLaw, curveIndex, loadings, Pa=True):
     for loading in loadings:    
+        #print(loading)
         path = f"targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}.xlsx"
-        trueCurve = preprocessExperimentalTrue(path, True)
-        processCurve = preprocessExperimentalFitted(path, True) 
+        trueCurve = preprocessExperimentalTrue(path, Pa)
+        processCurve = preprocessExperimentalFitted(path, Pa) 
+        #print("True curve")
+        #print(trueCurve)
+        #print("Processed curve")
+        #print(processCurve)
         np.save(f"targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}_true.npy", trueCurve)
         np.save(f"targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}_process.npy", processCurve)
 
@@ -165,24 +170,28 @@ def preprocessDAMASKTrue(path, excel=False):
     trueStress = df["Mises(Cauchy)"].to_numpy()
     return {"strain": trueStrain, "stress": trueStress}
 
-def preprocessExperimentalTrue(path, excel=False):
-    if not excel:
-        df = pd.read_csv(path, delimiter = "\t")
+def preprocessExperimentalTrue(path, Pa):
+    if Pa:
+        df = pd.read_excel(path, usecols=["exp_strain","exp_stress (Pa)"], engine="openpyxl")
+        trueStrain = df["exp_strain"].to_numpy()
+        trueStress = df["exp_stress (Pa)"].to_numpy()
     else:
-        df = pd.read_excel(path, usecols=["exp_strain","exp_stress"], engine="openpyxl")
-    trueStrain = df["exp_strain"].to_numpy()
-    trueStress = df["exp_stress"].to_numpy()
+        df = pd.read_excel(path, usecols=["exp_strain","exp_stress (MPa)"], engine="openpyxl")
+        trueStrain = df["exp_strain"].to_numpy()
+        trueStress = df["exp_stress (MPa)"].to_numpy()
     trueStrain = trueStrain[~np.isnan(trueStrain)]
     trueStress = trueStress[~np.isnan(trueStress)]
     return {"strain": trueStrain, "stress": trueStress}
 
-def preprocessExperimentalFitted(path, excel=False):
-    if not excel:
-        df = pd.read_csv(path, delimiter = "\t")
+def preprocessExperimentalFitted(path, Pa):
+    if Pa:
+        df = pd.read_excel(path, usecols=["fitted_strain","fitted_stress (Pa)"], engine="openpyxl")
+        fittedStrain = df["fitted_strain"].to_numpy()
+        fittedStress = df["fitted_stress (Pa)"].to_numpy()
     else:
-        df = pd.read_excel(path, usecols=["fitted_strain","fitted_stress"], engine="openpyxl")
-    fittedStrain = df["fitted_strain"].to_numpy()
-    fittedStress = df["fitted_stress"].to_numpy()
+        df = pd.read_excel(path, usecols=["fitted_strain","fitted_stress (MPa)"], engine="openpyxl")
+        fittedStrain = df["fitted_strain"].to_numpy()
+        fittedStress = df["fitted_stress (MPa)"].to_numpy()
     fittedStrain = fittedStrain[~np.isnan(fittedStrain)]
     fittedStress = fittedStress[~np.isnan(fittedStress)]
     return {"strain": fittedStrain, "stress": fittedStress}

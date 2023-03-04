@@ -11,6 +11,8 @@ import numpy as np
 import optimize_config
 import initial_simulations  
 import prepare_data
+#import stages_analysis
+#import optimization_stages
 from modules.SIM_damask2 import *
 from prepare_data import * 
 from modules.preprocessing import *
@@ -73,12 +75,13 @@ def main_optimize(info):
     prepared_data = prepare_data.main_prepare(info)
     
     # -------------------------------------------------------------------
-    #   Step 3: Extracting the experimental and simulated data
+    #   Step 4: Analyzing the optimization stages
     # -------------------------------------------------------------------
 
+    #analyzed_stages= stages_analysis.main_stagesAnalysis(info)
 
     # -------------------------------------------------------------------
-    #   Step 3: Optimize the yielding parameters for the curves in parallel
+    #   Step 5: Optimize the parameters for the curves
     # -------------------------------------------------------------------        
 
     

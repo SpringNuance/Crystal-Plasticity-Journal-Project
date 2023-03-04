@@ -1,4 +1,21 @@
+# External libraries
+import os
+import numpy as np
+import optimize_config
+from modules.SIM_damask2 import *
+from modules.preprocessing import *
+from modules.helper import *
+from prettytable import PrettyTable
+
 def main_trainANN(info):
+
+    numberOfHiddenLayers = info['numberOfHiddenLayers']
+    hiddenNodesFormula = info['hiddenNodesFormula']
+    ANNOptimizer = info['ANNOptimizer']
+    L2_regularization = info['L2_regularization']
+    learning_rate = info['learning_rate']
+    loading_epochs = info['loading_epochs']
+
     messages = []
     messages.append(70 * "*" + "\n")
     messages.append(f"Step 2: Train the regressors for all loadings with the initial simulations of curve {CPLaw}{curveIndex}\n\n")

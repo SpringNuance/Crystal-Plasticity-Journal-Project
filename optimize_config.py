@@ -165,10 +165,10 @@ def main_config():
         "PH": {
             "a": "", # Empty string means this parameter is dimensionless
             "gdot0": "s⁻¹", 
-            "h0": "MPa", 
+            "h0": "Pa", 
             "n": "", 
-            "tau0": "MPa", 
-            "tausat": "MPa",
+            "tau0": "Pa", 
+            "tausat": "Pa",
             "self": "", 
             "coplanar": "", 
             "collinear": "", 

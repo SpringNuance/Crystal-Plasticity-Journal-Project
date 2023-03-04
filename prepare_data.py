@@ -12,10 +12,6 @@ from prettytable import PrettyTable
 
 def main_prepare(info):
 
-    def printList(messages):
-        for message in messages:
-            print(message)
-
     server = info['server']
     loadings = info['loadings']
     CPLaw = info['CPLaw']
@@ -53,7 +49,8 @@ def main_prepare(info):
     for loading in loadings:
         initial_loadings_trueCurves[loading] = np.load(f'results/{material}/{CPLaw}/universal/{loading}/initial_processCurves.npy', allow_pickle=True).tolist()
         initial_loadings_processCurves[loading] = np.load(f'results/{material}/{CPLaw}/universal/{loading}/initial_trueCurves.npy', allow_pickle=True).tolist()
-
+    # print(list(initial_loadings_trueCurves[loading].keys())[0])
+    # time.sleep(30)
     # Calculating average strain from initial simulations 
     average_initialStrains = {}
     for loading in loadings:
@@ -82,6 +79,8 @@ def main_prepare(info):
         exp_curve["true"][loading] = exp_trueCurve
         exp_curve["process"][loading] = exp_processCurve
         exp_curve["interpolate"][loading] = exp_interpolateCurve 
+        print(exp_curve["process"])
+        time.sleep(30)
         np.save(f"targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}_interpolate.npy", exp_curve["interpolate"][loading])
     
     np.save(f"targets/{material}/{CPLaw}/{CPLaw}{curveIndex}_curves.npy", exp_curve)
@@ -220,32 +219,14 @@ def main_prepare(info):
     print(f"{iteration_length} iteration simulations completed.\n")
     print(f"{initial_length} initial simulations completed.\n")     
     print(f"Total: {initial_length + iteration_length} simulations completed.\n")
-    print(f"Experimental and simulated curves preparation for {CPLaw}{curveIndex} has completed\n\n")
+    print(f"Experimental and simulated curves preparation for {CPLaw}{curveIndex} has completed\n")
 
-    stringMessage = f"Parameter set of the closest simulation curve to the target curve {CPLaw}{curveIndex} is: \n"
+    print(f"Parameter set of the closest simulation curve to the target curve {CPLaw}{curveIndex} is: \n")
     
-    logTable = PrettyTable()
+    printParametersClean(default_curves["parameters_tuple"], param_info, paramsUnit, CPLaw)
 
-    logTable.field_names = ["Parameter", "Value"]
-
-    #print(param_info)
-    for paramValue in default_curves["parameters_tuple"]:
-        #print(paramValue)
-        exponent = param_info[paramValue[0]]['exponent'] if param_info[paramValue[0]]['exponent'] != "e0" else ""
-        unit = paramsUnit[CPLaw][paramValue[0]]
-        paramString = f"{paramValue[1]}"
-        if exponent != "":
-            paramString += exponent
-        if unit != "":
-            paramString += f" {unit}"
-        logTable.add_row([paramValue[0], paramString])
-
-    stringMessage += logTable.get_string()
-    stringMessage += "\n"
-    print(stringMessage)
-
-    print(f"The default parameters for the optimization of curve {CPLaw}{curveIndex}\n\n")
-  
+    print(f"The default parameters for the optimization of curve {CPLaw}{curveIndex}\n")
+    time.sleep(30)
     np.save(f'{initialResultPath}/common/initial_loadings_trueCurves', initial_loadings_trueCurves) 
     np.save(f'{initialResultPath}/common/initial_loadings_processCurves', initial_loadings_processCurves)
     np.save(f'{initialResultPath}/common/initial_loadings_interpolateCurves', initial_loadings_interpolateCurves)
@@ -294,7 +275,7 @@ def main_prepare(info):
         'reverse_combined_loadings_processCurves': reverse_combined_loadings_processCurves,
         'reverse_combined_loadings_interpolateCurves': reverse_combined_loadings_interpolateCurves,
     }
-    time.sleep(30)
+    time.sleep(60)
     return prepared_data
 
 if __name__ == '__main__':

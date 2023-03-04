@@ -1,12 +1,22 @@
+# External libraries
+import os
+import numpy as np
+import optimize_config
+from modules.SIM_damask2 import *
+from modules.preprocessing import *
+from modules.helper import *
+from prettytable import PrettyTable
+
+def main_stagesAnalysis(info):    
     messages = []
     messages.append(70 * "*" + "\n")
     messages.append(f"Step 3: Assessment of number optimization stages and level of deviation percentage of curve {CPLaw}{curveIndex}\n\n")
 
     allParams = dict(default_params).keys()
 
-    yieldingParams = list(filter(lambda param: general_param_info[param]["type"] == "yielding", allParams))
-    large_hardeningParams = list(filter(lambda param: general_param_info[param]["type"] == "large_hardening", allParams))
-    small_hardeningParams = list(filter(lambda param: general_param_info[param]["type"] == "small_hardening", allParams))
+    yieldingParams = list(filter(lambda param: param_info[param]["type"] == "yielding", allParams))
+    large_hardeningParams = list(filter(lambda param: param_info[param]["type"] == "large_hardening", allParams))
+    small_hardeningParams = list(filter(lambda param: param_info[param]["type"] == "small_hardening", allParams))
     
     messages.append(f"The yielding parameters are {yieldingParams}\n")
     messages.append(f"The large hardening parameters are {large_hardeningParams}\n")
@@ -20,14 +30,14 @@
         messages.append("1st stage optimization required\n")
     
     if len(large_hardeningParams) == 0:
-        messages.append("There are no large hardening parameters\n")
+        messages.append("There are no non-Bauschinger effect hardening parameters\n")
         messages.append("2nd stage optimization not required\n")
     else:
         messages.append(f"There are {len(large_hardeningParams)} large hardening parameters\n")
         messages.append("2nd stage optimization required\n")
 
     if len(small_hardeningParams) == 0:
-        messages.append("There are no small hardening parameters\n")
+        messages.append("There are no Bauschinger effect hardening parameters\n")
         messages.append("3rd stage optimization not required\n\n")
     else:
         messages.append(f"There are {len(small_hardeningParams)} small hardening parameters\n")
@@ -70,3 +80,7 @@
     ordinalUpper = ["First", "Second", "Third"]
     ordinalLower = ["first", "second", "third"]
     ordinalNumber = ["1","2","3"]
+
+if __name__ == '__main__':
+    info = optimize_config.main()
+    main_stagesAnalysis(info)

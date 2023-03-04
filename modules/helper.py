@@ -1,9 +1,8 @@
-from audioop import reverse
 from math import *
 import copy
 import numpy as np
 from modules.stoploss import *
-
+from prettytable import PrettyTable
 
 from modules.helper import *
 import sys, os
@@ -148,3 +147,30 @@ def calculateMSE(exp_interpolateCurves, sim_interpolateCurves, optimize_type, lo
                 MSE[loading]["H2"] = H2Nonlinear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"])
                 MSE[loading]["weighted_loading_MSE"] = fitnessHardeningNonlinear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"], weightsHardening)
     return MSE
+
+def printParametersClean(parameters_tuple, param_info, paramsUnit, CPLaw):
+    logTable = PrettyTable()
+
+    logTable.field_names = ["Parameter", "Value"]
+
+    #print(param_info)
+    for paramValue in parameters_tuple:
+        print(paramValue)
+        exponent = param_info[paramValue[0]]['exponent'] if param_info[paramValue[0]]['exponent'] != "e0" else ""
+        unit = paramsUnit[CPLaw][paramValue[0]]
+        paramString = f"{paramValue[1]}"
+        if exponent != "":
+            paramString += exponent
+        if unit != "":
+            paramString += f" {unit}"
+        logTable.add_row([paramValue[0], paramString])
+    
+    stringMessage = "\n"
+    stringMessage += logTable.get_string()
+    stringMessage += "\n"
+
+    print(stringMessage)
+
+def printList(messages):
+    for message in messages:
+        print(message)

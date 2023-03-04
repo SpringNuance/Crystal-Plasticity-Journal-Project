@@ -217,7 +217,7 @@ def getIndexAfterStrainLevel(strain, level):
         if strain[i] > level:
             return i
 
-def interpolatingStrain(average_initialStrain, exp_strain, stress, yieldingPoint, loading):
+def interpolatingStrain(average_initialStrain, exp_strain, sim_stress, yieldingPoint, loading):
     if loading.startswith("linear"):
         beforeYieldingIndex = getIndexBeforeStrainLevel(average_initialStrain, yieldingPoint) 
         interpolatedStrain = average_initialStrain[beforeYieldingIndex:]
@@ -227,7 +227,7 @@ def interpolatingStrain(average_initialStrain, exp_strain, stress, yieldingPoint
             indexOfInterpolatedStrainAfterLastExpStrain = getIndexAfterStrainLevel(interpolatedStrain, exp_strain[-1])
             interpolatedStrain = interpolatedStrain[:indexOfInterpolatedStrainAfterLastExpStrain+1]
     else: 
-        reloadingIndex = turningStressPoints(stress)[1]
+        reloadingIndex = turningStressPoints(sim_stress)[1]
         interpolatedStrain = average_initialStrain[reloadingIndex:]
         beforeYieldingIndex = getIndexBeforeStrainLevel(interpolatedStrain, yieldingPoint)
         interpolatedStrain = interpolatedStrain[beforeYieldingIndex:]
@@ -240,11 +240,12 @@ def interpolatingStrain(average_initialStrain, exp_strain, stress, yieldingPoint
 
 def interpolatingStress(strain, stress, interpolatedStrain, loading):
     # interpolated function fits the stress-strain curve data 
-    if loading == "linear_uniaxial_RD":
+    #print(stress)
+    if loading.startswith("linear"):
         # Allows extrapolation
         interpolatingFunction = interp1d(strain, stress, fill_value='extrapolate')
         # Calculate the stress values at the interpolated strain points
-        interpolatedStress = interpolatingFunction(interpolatedStrain)
+        interpolatedStress = interpolatingFunction(interpolatedStrain).reshape(-1)
         
     else:
         if len(turningStressPoints(stress)) != 0:
@@ -254,6 +255,6 @@ def interpolatingStress(strain, stress, interpolatedStrain, loading):
         # Allows extrapolation
         interpolatingFunction = interp1d(strain, stress, fill_value='extrapolate')
         # Calculate the stress values at the interpolated strain points
-        interpolatedStress = interpolatingFunction(interpolatedStrain)
+        interpolatedStress = interpolatingFunction(interpolatedStrain).reshape(-1)
     #print(interpolatedStress)
     return interpolatedStress 

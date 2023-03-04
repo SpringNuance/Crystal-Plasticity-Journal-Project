@@ -65,7 +65,7 @@ def fitnessYieldingNonlinear(exp_stress, sim_stress, interpolating_strain, weigh
 def fitnessYieldingAllLoadings(exp_curves, sim_curves, loadings, weightsLoading, weightsYielding):
     fitnessAllLoadings = 0
     for loading in loadings:
-        if loading == "linear_uniaxial_RD":
+        if loading.startswith("linear"):
             fitnessAllLoadings += weightsLoading[loading] * fitnessYieldingLinear(exp_curves[loading]["stress"], sim_curves[loading]["stress"], exp_curves[loading]["strain"], weightsYielding)
         else: 
             fitnessAllLoadings += weightsLoading[loading] * fitnessYieldingNonlinear(exp_curves[loading]["stress"], sim_curves[loading]["stress"], exp_curves[loading]["strain"], weightsYielding)
@@ -154,7 +154,7 @@ def fitnessHardeningAllLoadings(exp_curves, sim_curves, loadings, weightsLoading
     fitnessAllLoadings = 0
     for loading in loadings:
         #print(loading)
-        if loading == "linear_uniaxial_RD":
+        if loading.startswith("linear"):
             #print(weightsLoading[loading] * fitnessHardeningLinear(exp_curves[loading]["stress"], sim_curves[loading]["stress"], exp_curves[loading]["strain"], weightsHardening))
             fitnessAllLoadings += weightsLoading[loading] * fitnessHardeningLinear(exp_curves[loading]["stress"], sim_curves[loading]["stress"], exp_curves[loading]["strain"], weightsHardening)
         else:
@@ -197,7 +197,7 @@ def insideYieldingDevAllLoadings(exp_curves, sim_curves, loadings, percentDeviat
         simStress = sim_curves[loading]['stress']
         interpolating_strain = exp_curves[loading]['strain']
         percentDeviation = percentDeviations[loading]
-        if loading == "linear_uniaxial_RD":
+        if loading.startswith("linear"):
             thisLoadingSatisfied = insideYieldingDevLinear(expStress, simStress, interpolating_strain, percentDeviation)
         else:
             thisLoadingSatisfied = insideYieldingDevNonlinear(expStress, simStress, interpolating_strain, percentDeviation)
@@ -249,7 +249,7 @@ def insideHardeningDevAllLoadings(exp_curves, sim_curves, loadings, percentDevia
         simStress = sim_curves[loading]['stress']
         interpolating_strain = exp_curves[loading]['strain']
         percentDeviation = percentDeviations[loading]
-        if loading == "linear_uniaxial_RD":
+        if loading.startswith("linear"):
             thisLoadingSatisfied = insideHardeningDevLinear(expStress, simStress, interpolating_strain, percentDeviation)
         else:
             thisLoadingSatisfied = insideHardeningDevNonlinear(expStress, simStress, interpolating_strain, percentDeviation)

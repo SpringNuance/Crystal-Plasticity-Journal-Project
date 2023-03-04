@@ -123,7 +123,7 @@ def calculateMSE(exp_interpolateCurves, sim_interpolateCurves, optimize_type, lo
     if optimize_type == "yielding":
         MSE["weighted_total_MSE"] = fitnessYieldingAllLoadings(exp_interpolateCurves, sim_interpolateCurves, loadings, weightsLoading, weightsYielding)
         for loading in loadings:
-            if loading == "linear_uniaxial_RD":
+            if loading.startswith("linear"):
                 MSE[loading] = {}
                 MSE[loading]["Y1"] = Y1Linear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"])
                 MSE[loading]["Y2"] = Y2Linear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"])
@@ -137,7 +137,7 @@ def calculateMSE(exp_interpolateCurves, sim_interpolateCurves, optimize_type, lo
     if optimize_type == "hardening":
         MSE["weighted_total_MSE"] = fitnessHardeningAllLoadings(exp_interpolateCurves, sim_interpolateCurves, loadings, weightsLoading, weightsHardening)
         for loading in loadings:
-            if loading == "linear_uniaxial_RD":
+            if loading.startswith("linear"):
                 MSE[loading] = {}
                 MSE[loading]["H1"] = H1Linear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"])
                 MSE[loading]["H2"] = H2Linear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"])

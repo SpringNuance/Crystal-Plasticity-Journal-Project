@@ -11,6 +11,7 @@ import numpy as np
 import optimize_config
 import initial_simulations  
 import prepare_data
+import train_ANN
 #import stages_analysis
 #import optimization_stages
 from modules.SIM_damask2 import *
@@ -43,10 +44,8 @@ def main_optimize(info):
     searchingSpace = info['searchingSpace']
     roundContinuousDecimals = info['roundContinuousDecimals']
     linearYieldingDev = info['linearYieldingDev']
-    firstLinearHardeningDev = info['firstLinearHardeningDev'] 
-    secondLinearHardeningDev = info['secondLinearHardeningDev']
-    firstNonlinearHardeningDev = info['firstNonlinearHardeningDev']
-    secondNonlinearHardeningDev = info['secondNonlinearHardeningDev']
+    linearHardeningDev = info['linearHardeningDev'] 
+    nonlinearHardeningDev = info['nonlinearHardeningDev']
     loadings = info['loadings']
     exampleLoading = info['exampleLoading']
     yieldingPoints = info['yieldingPoints']
@@ -63,25 +62,57 @@ def main_optimize(info):
     loading_epochs = info['loading_epochs']
     
     # -------------------------------------------------------------------
-    #   Step 1: Running initial simulations
+    #   Step 0: Running initial simulations
     # -------------------------------------------------------------------
 
-    initial_simulations.main_initial_sims(info)
+    initial_simulations.main_initialSims(info)
 
     # -------------------------------------------------------------------
-    #   Step 2: Extracting the experimental and simulated data
+    #   Step 1: Extracting the experimental and simulated data
     # -------------------------------------------------------------------
 
-    prepared_data = prepare_data.main_prepare(info)
+    prepared_data = prepare_data.main_prepareData(info)
     
     # -------------------------------------------------------------------
-    #   Step 4: Analyzing the optimization stages
+    #   Step 2: Training the ANN models
+    # -------------------------------------------------------------------
+
+    initial_length = prepared_data['initial_length']
+    iteration_length = prepared_data['iteration_length']
+    exp_curve = prepared_data['exp_curve']
+    initialResultPath = prepared_data['initialResultPath']
+    iterationResultPath = prepared_data['iterationResultPath']
+    stage_CurvesList = prepared_data['stage_CurvesList']
+
+    initial_loadings_trueCurves = prepared_data['initial_loadings_trueCurves']
+    initial_loadings_processCurves = prepared_data['initial_loadings_processCurves']
+    initial_loadings_interpolateCurves = prepared_data['initial_loadings_interpolateCurves']
+    reverse_initial_loadings_trueCurves = prepared_data['reverse_initial_loadings_trueCurves']
+    reverse_initial_loadings_processCurves = prepared_data['reverse_initial_loadings_processCurves']
+    reverse_initial_loadings_interpolateCurves = prepared_data['reverse_initial_loadings_interpolateCurves']
+    iteration_loadings_trueCurves = prepared_data['iteration_loadings_trueCurves']
+    iteration_loadings_processCurves = prepared_data['iteration_loadings_processCurves']
+    iteration_loadings_interpolateCurves = prepared_data['iteration_loadings_interpolateCurves']
+    reverse_iteration_loadings_trueCurves = prepared_data['reverse_iteration_loadings_trueCurves']
+    reverse_iteration_loadings_processCurves = prepared_data['reverse_iteration_loadings_processCurves']
+    reverse_iteration_loadings_interpolateCurves = prepared_data['reverse_iteration_loadings_interpolateCurves']
+    combined_loadings_trueCurves = prepared_data['combined_loadings_trueCurves']
+    combined_loadings_processCurves = prepared_data['combined_loadings_processCurves']
+    combined_loadings_interpolateCurves = prepared_data['combined_loadings_interpolateCurves']
+    reverse_combined_loadings_trueCurves = prepared_data['reverse_combined_loadings_trueCurves']
+    reverse_combined_loadings_processCurves = prepared_data['reverse_combined_loadings_processCurves']
+    reverse_combined_loadings_interpolateCurves = prepared_data['reverse_combined_loadings_interpolateCurves']
+    
+    trained_models = train_ANN.main_trainANN(info, prepared_data)
+    
+    # -------------------------------------------------------------------
+    #   Step 3: Analyzing the optimization stages
     # -------------------------------------------------------------------
 
     #analyzed_stages= stages_analysis.main_stagesAnalysis(info)
 
     # -------------------------------------------------------------------
-    #   Step 5: Optimize the parameters for the curves
+    #   Step 4: Optimize the parameters for the curves
     # -------------------------------------------------------------------        
 
     

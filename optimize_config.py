@@ -97,13 +97,9 @@ def main_config():
 
     linearYieldingDev = dataConfig["linearYieldingDev"]
 
-    firstLinearHardeningDev = dataConfig["firstLinearHardeningDev"]  
+    linearHardeningDev = dataConfig["nonlinearHardeningDev"]  
 
-    secondLinearHardeningDev = dataConfig["secondLinearHardeningDev"]  
-
-    firstNonlinearHardeningDev = dataConfig["firstNonlinearHardeningDev"]  
-
-    secondNonlinearHardeningDev = dataConfig["secondNonlinearHardeningDev"]  
+    nonlinearHardeningDev = dataConfig["linearHardeningDev"]  
 
     # Setting the weights of the two yield stress objective functions:  
     weightsYielding = {"wy1": 0.0995, "wy2": 0.0005}
@@ -208,13 +204,9 @@ def main_config():
 
     linearYieldingDevPercent = f"{linearYieldingDev}%"
 
-    firstLinearHardeningDevPercent = f"{firstLinearHardeningDev}%"
+    linearHardeningDevPercent = f"{linearHardeningDev}%"
 
-    secondLinearHardeningDevPercent = f"{secondLinearHardeningDev}%"
-
-    firstNonlinearHardeningDevPercent = f"{firstNonlinearHardeningDev}%"
-
-    secondNonlinearHardeningDevPercent = f"{secondNonlinearHardeningDev}%"
+    nonlinearHardeningDevPercent = f"{nonlinearHardeningDev}%"
 
     configMessages = [  
         f"\nWelcome to the Crystal Plasticity Parameter Calibration software\n\n",
@@ -231,13 +223,12 @@ def main_config():
     logTable.add_row(["Material", material])
     logTable.add_row(["CP Law", law])
     logTable.add_row(["Optimizer", optimizerName])
-    logTable.add_row(["Target curves", target_curve])
+    logTable.add_row(["Target curve", target_curve])
     logTable.add_row(["Rounding decimals", roundContinuousDecimals])
     logTable.add_row(["Linear yielding dev", linearYieldingDevPercent])
-    logTable.add_row(["Large linear hardening dev", firstLinearHardeningDevPercent])
-    logTable.add_row(["Small linear hardening dev", secondLinearHardeningDevPercent])
-    logTable.add_row(["Large nonlinear hardening dev", firstNonlinearHardeningDevPercent])
-    logTable.add_row(["Small nonlinear hardening dev", secondNonlinearHardeningDevPercent])
+    logTable.add_row(["Linear hardening dev", linearHardeningDevPercent])
+    logTable.add_row(["Nonlinear hardening dev", nonlinearHardeningDevPercent])
+
 
     configMessages.append(logTable.get_string())
     configMessages.append("\n")
@@ -328,17 +319,7 @@ def main_config():
     getParamRanges(material, CPLaw, curveIndex, searchingSpace, roundContinuousDecimals)
     param_info = loadGeneralParam(material, CPLaw)
 
-
     printList(configMessages)
-
-
-    assert firstLinearHardeningDev >= linearYieldingDev, "largeLinearHardeningDev must be larger than or equal linearYieldingDev"
-
-    assert firstLinearHardeningDev > secondLinearHardeningDev, "largeLinearHardeningDev must be larger than smallLinearHardeningDev"
-
-    assert firstNonlinearHardeningDev > secondNonlinearHardeningDev, "largeNonlinearHardeningDev must be larger than smallNonlinearHardeningDev"
-
-    assert secondNonlinearHardeningDev > secondLinearHardeningDev, "smallNonlinearHardeningDev must be larger than smallLinearHardeningDev"
 
     print("Generating necessary directories\n")
     print(f"The path to your main project folder is\n", f"{projectPath}\n")
@@ -354,6 +335,7 @@ def main_config():
     loading_epochs = {
         "PH": {
             "linear_uniaxial_RD": 2200, 
+            "linear_uniaxial_TD": 2200,
             "nonlinear_biaxial_RD": 3200, 
             "nonlinear_biaxial_TD": 2200,     
             "nonlinear_planestrain_RD": 3600,     
@@ -363,6 +345,7 @@ def main_config():
         },
         "DB":{
             "linear_uniaxial_RD": 2400, 
+            "linear_uniaxial_TD": 2200,
             "nonlinear_biaxial_RD": 2400, 
             "nonlinear_biaxial_TD": 2400,     
             "nonlinear_planestrain_RD": 2400,     
@@ -388,10 +371,8 @@ def main_config():
         'searchingSpace': searchingSpace,
         'roundContinuousDecimals': roundContinuousDecimals,
         'linearYieldingDev': linearYieldingDev, 
-        'firstLinearHardeningDev': firstLinearHardeningDev, 
-        'secondLinearHardeningDev': secondLinearHardeningDev, 
-        'firstNonlinearHardeningDev': firstNonlinearHardeningDev,
-        'secondNonlinearHardeningDev': secondNonlinearHardeningDev,
+        'linearHardeningDev': linearHardeningDev, 
+        'nonlinearHardeningDev': nonlinearHardeningDev, 
         'loadings': loadings,
         'exampleLoading': exampleLoading,
         'yieldingPoints': yieldingPoints, 

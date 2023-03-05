@@ -11,7 +11,7 @@ from modules.SIM_damask2 import *
 from modules.preprocessing import *
 from modules.helper import *
 
-def main_initial_sims(info):
+def main_initialSims(info):
 
     ############################################
     # Generating universal initial simulations #
@@ -55,4 +55,4 @@ def main_initial_sims(info):
 
 if __name__ == '__main__':
     info = optimize_config.main_config()
-    main_initial_sims(info)
+    main_initialSims(info)

@@ -155,7 +155,7 @@ def printParametersClean(parameters_tuple, param_info, paramsUnit, CPLaw):
 
     #print(param_info)
     for paramValue in parameters_tuple:
-        print(paramValue)
+        #print(paramValue)
         exponent = param_info[paramValue[0]]['exponent'] if param_info[paramValue[0]]['exponent'] != "e0" else ""
         unit = paramsUnit[CPLaw][paramValue[0]]
         paramString = f"{paramValue[1]}"

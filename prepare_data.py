@@ -10,7 +10,7 @@ from prettytable import PrettyTable
     #   Step 1: Loading progress and preparing data
     # -------------------------------------------------------------------
 
-def main_prepare(info):
+def main_prepareData(info):
 
     server = info['server']
     loadings = info['loadings']
@@ -47,17 +47,19 @@ def main_prepare(info):
     initial_loadings_trueCurves = {}
 
     for loading in loadings:
-        initial_loadings_trueCurves[loading] = np.load(f'results/{material}/{CPLaw}/universal/{loading}/initial_processCurves.npy', allow_pickle=True).tolist() 
+        initial_loadings_trueCurves[loading] = np.load(f'results/{material}/{CPLaw}/universal/{loading}/initial_processCurves.npy', allow_pickle=True).tolist()
         initial_loadings_processCurves[loading] = np.load(f'results/{material}/{CPLaw}/universal/{loading}/initial_trueCurves.npy', allow_pickle=True).tolist()
-    #print(list(initial_loadings_trueCurves[loading].keys())[0])
-    # time.sleep(30)
-    # Calculating average strain from initial simulations 
+        #print(initial_loadings_trueCurves[loading])
+        #time.sleep(180)
+        #print(list(initial_loadings_trueCurves[loading].keys())[0])
+    #time.sleep(180)
+    # # Calculating average strain from initial simulations 
     average_initialStrains = {}
     for loading in loadings:
         average_initialStrains[loading] = np.array(list(map(lambda strainstress: strainstress["strain"], initial_loadings_processCurves[loading].values()))).mean(axis=0)
     
     # Producing all target curves npy file
-    getTargetCurves(material, CPLaw, curveIndex, loadings, Pa=True)
+    getTargetCurves(material, CPLaw, curveIndex, loadings, Pa=False)
 
     # Preparing the experimental curve of all loadings
     exp_curve = {}
@@ -197,7 +199,6 @@ def main_prepare(info):
 
         # Obtaining the default hardening parameters
         default_params = sortedClosestHardening[0][0]
-
         default_curves = {}
         default_curves["iteration"] = 0
         default_curves["stage"] = 0
@@ -209,10 +210,13 @@ def main_prepare(info):
         default_curves["yielding_loss"] = calculateMSE(exp_curve["interpolate"], default_curves["interpolate"], "yielding", loadings, weightsLoading, weightsYielding, weightsHardening)
         default_curves["hardening_loss"] = calculateMSE(exp_curve["interpolate"], default_curves["interpolate"], "hardening", loadings, weightsLoading, weightsYielding, weightsHardening)
         np.save(f"{iterationResultPath}/common/default_curves.npy", default_curves)
-        print("Saving the default curves\n")
     else:
         default_curves = np.load(f"{iterationResultPath}/common/default_curves.npy", allow_pickle=True).tolist()
         print("The file default_curves.npy exists. Loading the default curves\n")
+
+    print(f"The default parameters for the optimization of curve {CPLaw}{curveIndex}\n")
+    
+    printParametersClean(default_curves["parameters_tuple"], param_info, paramsUnit, CPLaw)
 
     # Length of initial and iteration simulations
     initial_length = len(reverse_initial_loadings_processCurves)
@@ -224,12 +228,6 @@ def main_prepare(info):
     print(f"Total: {initial_length + iteration_length} simulations completed.\n")
     print(f"Experimental and simulated curves preparation for {CPLaw}{curveIndex} has completed\n")
 
-    print(f"Parameter set of the closest simulation curve to the target curve {CPLaw}{curveIndex} is: \n")
-    
-    printParametersClean(default_curves["parameters_tuple"], param_info, paramsUnit, CPLaw)
-
-    print(f"The default parameters for the optimization of curve {CPLaw}{curveIndex}\n")
-   
     np.save(f'{initialResultPath}/common/initial_loadings_trueCurves', initial_loadings_trueCurves) 
     np.save(f'{initialResultPath}/common/initial_loadings_processCurves', initial_loadings_processCurves)
     np.save(f'{initialResultPath}/common/initial_loadings_interpolateCurves', initial_loadings_interpolateCurves)
@@ -278,9 +276,9 @@ def main_prepare(info):
         'reverse_combined_loadings_processCurves': reverse_combined_loadings_processCurves,
         'reverse_combined_loadings_interpolateCurves': reverse_combined_loadings_interpolateCurves,
     }
-    time.sleep(60)
+    #time.sleep(180)
     return prepared_data
 
 if __name__ == '__main__':
     info = optimize_config.main()
-    main_prepare(info)
+    main_prepareData(info)

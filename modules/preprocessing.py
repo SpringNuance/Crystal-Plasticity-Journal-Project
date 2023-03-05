@@ -267,3 +267,15 @@ def interpolatingStress(strain, stress, interpolatedStrain, loading):
         interpolatedStress = interpolatingFunction(interpolatedStrain).reshape(-1)
     #print(interpolatedStress)
     return interpolatedStress 
+
+def multiplyStressByUnit(curves, convertUnit):
+    rearrangeCurves = {}
+
+    # create a new dictionary with stress multiplied by 1e6
+
+    for key, value in curves.items():
+        new_value = copy.deepcopy(value)
+        new_value['stress'] = value['stress'] * convertUnit
+        rearrangeCurves[key] = new_value
+    
+    return rearrangeCurves

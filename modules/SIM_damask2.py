@@ -225,6 +225,7 @@ class SIM:
         loadings = self.info["loadings"]
         material = self.info["material"]
         exampleLoading = self.info["exampleLoading"]
+        convertUnit = self.info["convertUnit"]
         np.save(f'{self.resultPath}/initial_params.npy', list(self.path2params[exampleLoading].values()))
         for loading in loadings:
             self.initial_trueCurves[loading] = {}
@@ -232,12 +233,16 @@ class SIM:
             for (index, params) in self.path2params[loading].items():
                 simPath = f"{self.simulationPath}/{loading}/{index}"
                 path2txt = f'{simPath}/postProc/{material}_tensionX.txt'
-                if loading == exampleLoading:
+                if loading.startswith("linear"):
                     processCurves = preprocessDAMASKLinear(path2txt)
+                    processCurves["stress"] *= 1e-6
                     trueCurves = preprocessDAMASKTrue(path2txt)
+                    trueCurves["stress"] *= 1e-6
                 else: 
                     processCurves = preprocessDAMASKNonlinear(path2txt)
+                    processCurves["stress"] *= 1e-6
                     trueCurves = preprocessDAMASKTrue(path2txt)
+                    trueCurves["stress"] *= 1e-6
                 self.initial_processCurves[loading][tuple(params.items())] = processCurves
                 self.initial_trueCurves[loading][tuple(params.items())] = trueCurves
             np.save(f"{self.resultPath}/{loading}/initial_processCurves.npy", self.initial_processCurves[loading])

@@ -9,13 +9,14 @@
 import os
 import numpy as np
 import optimize_config
-import initial_simulations  
-import prepare_data
-import train_ANN
-#import stages_analysis
-#import optimization_stages
+import stage0_initial_simulations  
+import stage1_prepare_data
+import stage2_train_ANN
+import stage3_stages_analysis
+import stage4_SOO
+import stage4_MOO
 from modules.SIM_damask2 import *
-from prepare_data import * 
+from stage1_prepare_data import * 
 from modules.preprocessing import *
 from modules.stoploss import *
 from modules.helper import *
@@ -26,10 +27,6 @@ from sklearn.preprocessing import StandardScaler
 
 def main_optimize(info):
 
-    def printList(messages):
-        for message in messages:
-            print(message)
-
     server = info['server']
     loadings = info['loadings']
     CPLaw = info['CPLaw']
@@ -37,8 +34,13 @@ def main_optimize(info):
     initialSims = info['initialSims']
     curveIndex = info['curveIndex']
     projectPath = info['projectPath']
+    optimizeStrategy = info['optimizeStrategy']
     optimizerName = info['optimizerName']
     param_info = info['param_info']
+    param_info_GA = info['param_info_GA']
+    param_info_BO = info['param_info_BO']
+    param_info_PSO = info['param_info_PSO']
+    logPath = info['logPath']
     material = info['material']
     method = info['method']
     searchingSpace = info['searchingSpace']
@@ -65,17 +67,14 @@ def main_optimize(info):
     #   Step 0: Running initial simulations
     # -------------------------------------------------------------------
 
-    initial_simulations.main_initialSims(info)
+    stage0_initial_simulations.main_initialSims(info)
 
     # -------------------------------------------------------------------
     #   Step 1: Extracting the experimental and simulated data
     # -------------------------------------------------------------------
 
-    prepared_data = prepare_data.main_prepareData(info)
-    
-    # -------------------------------------------------------------------
-    #   Step 2: Training the ANN models
-    # -------------------------------------------------------------------
+    prepared_data = stage1_prepare_data.main_prepareData(info)
+
 
     initial_length = prepared_data['initial_length']
     iteration_length = prepared_data['iteration_length']
@@ -103,64 +102,55 @@ def main_optimize(info):
     reverse_combined_loadings_processCurves = prepared_data['reverse_combined_loadings_processCurves']
     reverse_combined_loadings_interpolateCurves = prepared_data['reverse_combined_loadings_interpolateCurves']
     
-    trained_models = train_ANN.main_trainANN(info, prepared_data)
-    
+    # -------------------------------------------------------------------
+    #   Step 2: Training the ANN models
+    # -------------------------------------------------------------------
+
+    trained_models = stage2_train_ANN.main_trainANN(info, prepared_data, logging=True)
+
+    regressors = trained_models["regressors"]
+    scalers = trained_models["scalers"]
+    trainingErrors = trained_models["trainingErrors"]
+
     # -------------------------------------------------------------------
     #   Step 3: Analyzing the optimization stages
     # -------------------------------------------------------------------
 
-    #analyzed_stages= stages_analysis.main_stagesAnalysis(info)
+    stages_data = stage3_stages_analysis.main_stagesAnalysis(info, prepared_data)
+
+    deviationPercent = stages_data['deviationPercent']
+    deviationCondition = stages_data['deviationCondition']
+    optimizeParams = stages_data['optimizeParams']
+    parameterType = stages_data['parameterType']
+    optimizeType = stages_data['optimizeType']
+    ordinalUpper = stages_data['ordinalUpper']
+    ordinalLower = stages_data['ordinalLower']
+    ordinalNumber = stages_data['ordinalNumber']
 
     # -------------------------------------------------------------------
     #   Step 4: Optimize the parameters for the curves
     # -------------------------------------------------------------------        
-
     
+    if optimizeStrategy == "SOO":
+        stage4_SOO.main_SOO(info, prepared_data, stages_data, trained_models)
+    elif optimizeStrategy == "MOO":
+        stage4_MOO.main_MOO(info, prepared_data, stages_data, trained_models)
     # Outside the for-loop of 4 optimization stages
 
-    messages = [f"All four optimization stages have successfully completed for curve {CPLaw}{curveIndex}\n"]
-
-    ########
-    stringMessage = "The final optimized set of parameters is:\n"
-    
-    logTable = PrettyTable()
-    logTable.field_names = ["Parameter", "Value"]
-
-    stage4_curves = np.load(f"{iterationPath}/stage4_curves.npy", allow_pickle=True).tolist()
-
-    for param in stage4_curves['parameters_dict']:
-        paramValue = stage4_curves['parameters_dict'][param]
-        exponent = param_info[param]['exponent'] if param_info[param]['exponent'] != "e0" else ""
-        unit = paramsUnit[CPLaw][param]
-        paramString = f"{paramValue}"
-        if exponent != "":
-            paramString += exponent
-        if unit != "":
-            paramString += f" {unit}"
-        logTable.add_row([param, paramString])
-
-    stringMessage += logTable.get_string()
-    stringMessage += "\n"
-    messages.append(stringMessage)  
-    ########
-
-    messages.append(f"Optimization for curve {CPLaw}{curveIndex} has finished\n")
-
-    printList(messages, curveIndex)
+    printLog(f"All four optimization stages have successfully completed for curve {CPLaw}{curveIndex}\n", logPath)
+    printLog("The final optimized set of parameters is:\n")
+    stage3_curves = np.load(f"{iterationResultPath}/stage3_curves.npy", allow_pickle=True).tolist()
+    printDictParametersClean(stage3_curves['parameters_dict'], param_info, paramsUnit, CPLaw, logPath)
+    printLog(f"Optimization for curve {CPLaw}{curveIndex} has finished\n", logPath)
 
     # ------------------------------
     #   Finalizing the optimization 
     # ------------------------------
 
-    print("\n" + 70 * "=" + "\n")
-    print("Fitting parameter optimization for all target curves completed\n")
-    print("Congratulations! Thank you for using the Crystal Plasticity Software\n")
+    printLog("\n" + 70 * "=" + "\n", logPath)
+    printLog(f"Parameter optimization for the target curve {CPLaw}{curveIndex} completed\n", logPath)
+    printLog("Congratulations! Thank you for using the Crystal Plasticity Software\n", logPath)
 
 if __name__ == '__main__':
-
-    # -------------------------------------------------------------------
-    #   Step 0: Defining the initial simulation configurations
-    # -------------------------------------------------------------------
-
     info = optimize_config.main_config()
     main_optimize(info)

@@ -58,45 +58,40 @@ class GA(optimizer):
 
         GA_bounds = []
         for param in self.optimize_params:
-            if searchingSpace == "discrete":
-                GA_bounds.append(param_info_GA_discrete[param])
-            elif searchingSpace == "continuous":
-                GA_bounds.append(param_info_GA_continuous[param])
+            GA_bounds.append(param_info_GA_discrete[param])
+
         num_genes = len(GA_bounds)
 
-        def fitnessGA(solution, solution_idx):
+        def lossGA(solution, solution_idx):
             default_params_dict = dict(self.default_params)
             counter = 0
             for param in self.optimize_params:
-                if searchingSpace == "discrete":
-                    default_params_dict[param] = solution[counter]
-                elif searchingSpace == "continuous":
-                    default_params_dict[param] = round(solution[counter], roundContinuousDecimals)
+                default_params_dict[param] = solution[counter]
                 counter += 1 
             candidate_params = np.array(list(default_params_dict.values())) 
 
             if self.optimize_type == "yielding":
                 scaledParams = scalers["linear_uniaxial_RD"].transform(candidate_params.reshape(1, -1))
                 predicted_sim_stress = regressors["linear_uniaxial_RD"].predict(scaledParams).flatten() # changing [[1,2,3...]] into [1,2,3,..]
-                fitness = fitnessYieldingLinear(exp_curves["interpolate"]["linear_uniaxial_RD"]["stress"], predicted_sim_stress, exp_curves["interpolate"]["linear_uniaxial_RD"]["strain"], weightsYielding)
+                loss = lossYieldingOneLinear(exp_curves["interpolate"]["linear_uniaxial_RD"]["stress"], predicted_sim_stress, exp_curves["interpolate"]["linear_uniaxial_RD"]["strain"], weightsYielding)
             elif self.optimize_type == "hardening":
-                fitness = 0
+                loss = 0
                 for loading in loadings:
                     scaledParams = scalers[loading].transform(candidate_params.reshape(1, -1))
                     predicted_sim_stress = regressors[loading].predict(scaledParams).flatten() # changing [[1,2,3...]] into [1,2,3,..]
                     if loading == "linear_uniaxial_RD":
-                        fitness += weightsLoading[loading] * fitnessHardeningLinear(exp_curves["interpolate"][loading]["stress"], predicted_sim_stress,  exp_curves["interpolate"][loading]["strain"], weightsHardening)
+                        loss += weightsLoading[loading] * lossHardeningOneLinear(exp_curves["interpolate"][loading]["stress"], predicted_sim_stress,  exp_curves["interpolate"][loading]["strain"], weightsHardening)
                     else:
-                        fitness += weightsLoading[loading] * fitnessHardeningNonlinear(exp_curves["interpolate"][loading]["stress"], predicted_sim_stress,  exp_curves["interpolate"][loading]["strain"], weightsHardening)
+                        loss += weightsLoading[loading] * lossHardeningOneNonlinear(exp_curves["interpolate"][loading]["stress"], predicted_sim_stress,  exp_curves["interpolate"][loading]["strain"], weightsHardening)
   
-            fitnessScore = 1/fitness
-            return fitnessScore
+            lossScore = 1/loss
+            return lossScore
         
         ga_instance = pygad.GA(num_generations=self.num_generations, 
                             num_parents_mating=self.num_parents_mating, 
                             sol_per_pop=self.sol_per_pop, 
                             num_genes=num_genes,
-                            fitness_func=fitnessGA,
+                            loss_func=lossGA,
                             gene_space=GA_bounds,
                             allow_duplicate_genes=self.allow_duplicate_genes,
                             parent_selection_type=self.parent_selection_type,
@@ -117,18 +112,16 @@ class GA(optimizer):
         searchingSpace = self.info["searchingSpace"]
         roundContinuousDecimals = self.info["roundContinuousDecimals"]
 
-        solution, solution_fitness, solution_idx = self.optimizer.best_solution(self.optimizer.last_generation_fitness)
-        solution_fitness = 1/solution_fitness
+        solution, solution_loss, solution_idx = self.optimizer.best_solution(self.optimizer.last_generation_loss)
+        solution_loss = 1/solution_loss
 
         solution_dict = dict(self.default_params)
         counter = 0
+        
         for param in self.optimize_params:
-            if searchingSpace == "discrete":
-                solution_dict[param] = round_to_step(param_info[param]['low'], param_info[param]['step'], solution[counter], param_info[param]['round'])
-            elif searchingSpace == "continuous":
-                solution_dict[param] = round(solution[counter], roundContinuousDecimals)
+            solution_dict[param] = round_to_step(param_info[param]['low'], param_info[param]['step'], solution[counter], param_info[param]['round'])
             counter += 1
         solution_tuple = tuple(solution_dict.items())
  
-        output = {"solution_dict": solution_dict, "solution_tuple": solution_tuple, "solution_fitness": solution_fitness}
+        output = {"solution_dict": solution_dict, "solution_tuple": solution_tuple, "solution_loss": solution_loss}
         return output

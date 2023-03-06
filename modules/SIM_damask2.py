@@ -263,8 +263,8 @@ class SIM:
         optimizerName = self.info["optimizerName"]
         searchingSpace = self.info["searchingSpace"]
 
-        self.simulationPath = f"simulations/{material}/{CPLaw}/{CPLaw}{curveIndex}_{optimizerName}_{searchingSpace}"
-        self.resultPath = f"results/{material}/{CPLaw}/{CPLaw}{curveIndex}_{optimizerName}_{searchingSpace}"
+        self.simulationPath = f"simulations/{material}/{CPLaw}/{CPLaw}{curveIndex}_{optimizerName}"
+        self.resultPath = f"results/{material}/{CPLaw}/{CPLaw}{curveIndex}_{optimizerName}"
 
         for loading in loadings:
             self.path2params[loading] = {}

@@ -26,6 +26,8 @@ def main_config():
 
     CPLaw = dataConfig["CPLaw"]
 
+    optimizeStrategy = dataConfig["optimizeStrategy"]
+
     optimizerName = dataConfig["optimizerName"] 
 
     # The 8 types of loadings: 2 linear loadings and 6 nonlinear loadings
@@ -80,10 +82,6 @@ def main_config():
     }
 
     convertUnit = 1e-6
-
-    def printList(messages):
-        for message in messages:
-            print(message)
 
     initialSims = dataConfig["initialSims"]  
 
@@ -187,6 +185,8 @@ def main_config():
         },
     }
 
+    # The logging path
+    logPath = f"log/{material}/{CPLaw}/{CPLaw}{curveIndex}_{optimizerName}.txt"
 
     # The project path folder
     projectPath = os.getcwd()
@@ -208,10 +208,10 @@ def main_config():
 
     nonlinearHardeningDevPercent = f"{nonlinearHardeningDev}%"
 
-    configMessages = [  
-        f"\nWelcome to the Crystal Plasticity Parameter Calibration software\n\n",
-        f"The configurations you have chosen: \n",       
-    ]
+    
+    printLog(f"\nWelcome to the Crystal Plasticity Parameter Calibration software\n\n", logPath)
+    printLog(f"The configurations you have chosen: \n", logPath)
+    
 
     logTable = PrettyTable()
 
@@ -221,8 +221,9 @@ def main_config():
     logTable.add_row(["Initial simulation method", method])
     logTable.add_row(["Searching space", searchingSpace])
     logTable.add_row(["Material", material])
-    logTable.add_row(["CP Law", law])
+    logTable.add_row(["Crystal plasticity law", law])
     logTable.add_row(["Optimizer", optimizerName])
+    logTable.add_row(["Optimization strategy", optimizeStrategy])
     logTable.add_row(["Target curve", target_curve])
     logTable.add_row(["Rounding decimals", roundContinuousDecimals])
     logTable.add_row(["Linear yielding dev", linearYieldingDevPercent])
@@ -230,8 +231,7 @@ def main_config():
     logTable.add_row(["Nonlinear hardening dev", nonlinearHardeningDevPercent])
 
 
-    configMessages.append(logTable.get_string())
-    configMessages.append("\n")
+    printLog(logTable.get_string() + "\n", logPath)
 
     #########################################################
     # Creating necessary directories for the configurations #
@@ -268,10 +268,10 @@ def main_config():
 
     checkCreate(f"{path}/{CPLaw}")
 
-    checkCreate(f"{path}/{CPLaw}/{CPLaw}{curveIndex}_{optimizerName}_{searchingSpace}")
-    checkCreate(f"{path}/{CPLaw}/{CPLaw}{curveIndex}_{optimizerName}_{searchingSpace}/common")
+    checkCreate(f"{path}/{CPLaw}/{CPLaw}{curveIndex}_{optimizerName}")
+    checkCreate(f"{path}/{CPLaw}/{CPLaw}{curveIndex}_{optimizerName}/common")
     for loading in loadings:
-        checkCreate(f"{path}/{CPLaw}/{CPLaw}{curveIndex}_{optimizerName}_{searchingSpace}/{loading}")
+        checkCreate(f"{path}/{CPLaw}/{CPLaw}{curveIndex}_{optimizerName}/{loading}")
     
     checkCreate(f"{path}/{CPLaw}/universal")
     checkCreate(f"{path}/{CPLaw}/universal/common")
@@ -286,9 +286,9 @@ def main_config():
 
     checkCreate(f"{path}/{CPLaw}")
 
-    checkCreate(f"{path}/{CPLaw}/{CPLaw}{curveIndex}_{optimizerName}_{searchingSpace}")
+    checkCreate(f"{path}/{CPLaw}/{CPLaw}{curveIndex}_{optimizerName}")
     for loading in loadings:
-        checkCreate(f"{path}/{CPLaw}/{CPLaw}{curveIndex}_{optimizerName}_{searchingSpace}/{loading}")
+        checkCreate(f"{path}/{CPLaw}/{CPLaw}{curveIndex}_{optimizerName}/{loading}")
     checkCreate(f"{path}/{CPLaw}/universal")
     for loading in loadings:
         checkCreate(f"{path}/{CPLaw}/universal/{loading}")  
@@ -319,10 +319,10 @@ def main_config():
     getParamRanges(material, CPLaw, curveIndex, searchingSpace, roundContinuousDecimals)
     param_info = loadGeneralParam(material, CPLaw)
 
-    printList(configMessages)
 
-    print("Generating necessary directories\n")
-    print(f"The path to your main project folder is\n", f"{projectPath}\n")
+    printLog("Generating necessary directories\n", logPath)
+    printLog(f"The path to your main project folder is\n", logPath)
+    printLog(f"{projectPath}\n", logPath)
 
     # ANN model selection from smallest test error 
     numberOfHiddenLayers = 2
@@ -332,16 +332,39 @@ def main_config():
     L2_regularization = 0.5
     learning_rate = 0.05
 
+    # loading_epochs = {
+    #     "PH": {
+    #         "linear_uniaxial_RD": 2300, 
+    #         "linear_uniaxial_TD": 2200,
+    #         "nonlinear_biaxial_RD": 2600, 
+    #         "nonlinear_biaxial_TD": 2200,     
+    #         "nonlinear_planestrain_RD": 2300,     
+    #         "nonlinear_planestrain_TD": 2600,     
+    #         "nonlinear_uniaxial_RD": 2600, 
+    #         "nonlinear_uniaxial_TD": 2300
+    #     },
+    #     "DB":{
+    #         "linear_uniaxial_RD": 2400, 
+    #         "linear_uniaxial_TD": 2200,
+    #         "nonlinear_biaxial_RD": 2400, 
+    #         "nonlinear_biaxial_TD": 2400,     
+    #         "nonlinear_planestrain_RD": 2400,     
+    #         "nonlinear_planestrain_TD": 2400,     
+    #         "nonlinear_uniaxial_RD": 2400, 
+    #         "nonlinear_uniaxial_TD": 2400
+    #     }
+    # }
+
     loading_epochs = {
         "PH": {
-            "linear_uniaxial_RD": 2200, 
-            "linear_uniaxial_TD": 2200,
-            "nonlinear_biaxial_RD": 3200, 
-            "nonlinear_biaxial_TD": 2200,     
-            "nonlinear_planestrain_RD": 3600,     
-            "nonlinear_planestrain_TD": 3000,     
-            "nonlinear_uniaxial_RD": 3400, 
-            "nonlinear_uniaxial_TD": 2000
+            "linear_uniaxial_RD": 10, 
+            "linear_uniaxial_TD": 10,
+            "nonlinear_biaxial_RD": 10, 
+            "nonlinear_biaxial_TD": 10,     
+            "nonlinear_planestrain_RD": 10,     
+            "nonlinear_planestrain_TD": 10,     
+            "nonlinear_uniaxial_RD": 10, 
+            "nonlinear_uniaxial_TD": 10
         },
         "DB":{
             "linear_uniaxial_RD": 2400, 
@@ -355,8 +378,28 @@ def main_config():
         }
     }
 
+    param_info_filtered = {}
+    for parameter, info in param_info.items():
+        if param_info[parameter]["optimized_target"]:
+            param_info_filtered[parameter] = info
+
+    param_info_GA = param_info_GA_func(param_info) # For GA discrete
+    param_info_BO = param_info_BO_func(param_info) # For BO continuous
+    param_info_PSO = param_info_PSO_func(param_info) # For PSO continuous
+
+    # print("param_info is:")
+    # print(param_info)
+    #print("param_info_GA is:")
+    #print(param_info_GA)
+    #print("param_info_BO is:")
+    #print(param_info_BO)
+    print("param_info_PSO is:")
+    print(param_info_PSO)
+    time.sleep(180)
+    
     info = {
         'param_info': param_info,
+        'logPath': logPath,
         'server': server,
         'loadings': loadings,
         'CPLaw': CPLaw,
@@ -364,8 +407,13 @@ def main_config():
         'initialSims': initialSims,
         'curveIndex': curveIndex,
         'projectPath': projectPath,
+        'optimizeStrategy': optimizeStrategy,
         'optimizerName': optimizerName,
         'param_info': param_info,
+        'param_info_GA': param_info_GA,
+        'param_info_BO': param_info_BO,
+        'param_info_PSO': param_info_PSO,
+        'param_info_filtered': param_info_filtered,
         'material': material,
         'method': method,
         'searchingSpace': searchingSpace,
@@ -388,5 +436,5 @@ def main_config():
         'learning_rate': learning_rate,
         'loading_epochs': loading_epochs,
     }
-
+    
     return info

@@ -3,11 +3,11 @@ import os
 import numpy as np
 import optimize_config
 import initial_simulations  
-import prepare_data
+import stage1_prepare_data
 #import stages_analysis
 #import optimization_stages
 from modules.SIM_damask2 import *
-from prepare_data import * 
+from stage1_prepare_data import * 
 from modules.preprocessing import *
 from modules.stoploss import *
 from modules.helper import *

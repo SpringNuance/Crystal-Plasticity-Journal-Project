@@ -3,6 +3,17 @@ from math import *
 from sklearn.metrics import mean_squared_error
 import time
 
+
+def turningStressPoints(trueStress):
+    differences = np.diff(trueStress)
+    index = 1
+    turningIndices = []
+    while index < differences.size:
+        if (differences[index - 1] <= 0 and differences[index] >= 0) or (differences[index - 1] >= 0 and differences[index] <= 0):
+            turningIndices.append(index)
+        index += 1
+    return turningIndices
+
 def isMonotonic(sim_stress):
     if len(turningStressPoints(sim_stress)) == 0:
         return True
@@ -21,9 +32,13 @@ def getIndexBeforeStrainLevel(strain, level):
 # Linearly increasing weight for MSE. If this is 0, then it is constant weight
 linearStep = 0
 
-#########################################################################
-# Yield stress objective and fitness functions for one and all loadings #
-#########################################################################
+############################################################################################
+# Yield stress objective and loss functions for one and all loadings for linear loading #
+############################################################################################
+
+################################################################
+# There is no need of yielding functions for nonlinear loading #
+################################################################
 
 def Y1Linear(exp_stress, sim_stress, interpolating_strain):
     expYieldStress = exp_stress[1]
@@ -35,45 +50,29 @@ def Y2Linear(exp_stress, sim_stress, interpolating_strain):
     simSlope = (sim_stress[2] - sim_stress[0]) /(interpolating_strain[2] - interpolating_strain[0])
     return abs(expSlope - simSlope) 
 
-def fitnessYieldingLinear(exp_stress, sim_stress, interpolating_strain, weightsYielding):
+def lossYieldingOneLinear(exp_stress, sim_stress, interpolating_strain, weightsYielding):
     wy1 = weightsYielding["wy1"]
     wy2 = weightsYielding["wy2"]
     if not isMonotonic(sim_stress):
         return 10e12
     else:
-        #print(wy1 * Y1Linear(exp_stress, sim_stress, interpolating_strain))
-        #print(wy2 * Y2Linear(exp_stress, sim_stress, interpolating_strain))
+        weightedY1Linear = wy1 * Y1Linear(exp_stress, sim_stress, interpolating_strain)
+        weightedY2Linear = wy2 * Y2Linear(exp_stress, sim_stress, interpolating_strain)
+        #print(weightedY1Linear)
+        #print(weightedY2Linear)
         #time.sleep(2)
-        return (wy1 * Y1Linear(exp_stress, sim_stress, interpolating_strain) + wy2 * Y2Linear(exp_stress, sim_stress, interpolating_strain))
+        return weightedY1Linear + weightedY2Linear
 
-def Y1Nonlinear(exp_stress, sim_stress, interpolating_strain):
-    expYieldStress = exp_stress[1]
-    simYieldStress = sim_stress[1] 
-    return (expYieldStress - simYieldStress) ** 2
-
-def Y2Nonlinear(exp_stress, sim_stress, interpolating_strain):
-    expSlope = (exp_stress[2] - exp_stress[0]) /(interpolating_strain[2] - interpolating_strain[0])
-    simSlope = (sim_stress[2] - sim_stress[0]) /(interpolating_strain[2] - interpolating_strain[0])
-    return (expSlope - simSlope) ** 2
-
-def fitnessYieldingNonlinear(exp_stress, sim_stress, interpolating_strain, weightsYielding):
-    wy1 = weightsYielding["wy1"]
-    wy2 = weightsYielding["wy2"]
-    
-    return (wy1 * Y1Nonlinear(exp_stress, sim_stress, interpolating_strain) + wy2 * Y2Nonlinear(exp_stress, sim_stress, interpolating_strain))
-
-def fitnessYieldingAllLoadings(exp_curves, sim_curves, loadings, weightsLoading, weightsYielding):
-    fitnessAllLoadings = 0
+def lossYieldingAllLinear(exp_curves, sim_curves, loadings, weightsLoading, weightsYielding):
+    lossAllLoadings = 0
     for loading in loadings:
         if loading.startswith("linear"):
-            fitnessAllLoadings += weightsLoading[loading] * fitnessYieldingLinear(exp_curves[loading]["stress"], sim_curves[loading]["stress"], exp_curves[loading]["strain"], weightsYielding)
-        else: 
-            fitnessAllLoadings += weightsLoading[loading] * fitnessYieldingNonlinear(exp_curves[loading]["stress"], sim_curves[loading]["stress"], exp_curves[loading]["strain"], weightsYielding)
-    return fitnessAllLoadings
+            lossAllLoadings += weightsLoading[loading] * lossYieldingOneLinear(exp_curves[loading]["stress"], sim_curves[loading]["stress"], exp_curves[loading]["strain"], weightsYielding)
+    return lossAllLoadings
 
-##############################################################################
-# Hardening objective and fitness functions for one loading and all loadings #
-##############################################################################
+#################################################################################################
+# Hardening objective and loss functions for one loading and all loadings for linear loading #
+#################################################################################################
 
 def H1Linear(exp_stress, sim_stress, interpolating_strain):
     linearlyIncreasingWeights = [] 
@@ -97,18 +96,25 @@ def H2Linear(exp_stress, sim_stress, interpolating_strain):
     weighted_MSE = np.average((exp_stress_difference - sim_stress_difference) ** 2, weights=linearlyIncreasingWeights)
     return weighted_MSE
 
-def fitnessHardeningLinear(exp_stress, sim_stress, interpolating_strain, weightsHardening):
-    wh1 = weightsHardening["wh1"]
+def lossHardeningOneLinear(exp_stress, sim_stress, interpolating_strain, weightsHardening):   
     wh2 = weightsHardening["wh2"]
-    #weighted_wh1 = wh1*H1Linear(exp_stress, sim_stress, interpolating_strain)
-    #weighted_wh2 = wh2*H2Linear(exp_stress, sim_stress, interpolating_strain)
-    #print(weighted_wh1)
-    #print(weighted_wh2)
+    weightedH2Linear = wh2 * H2Linear(exp_stress, sim_stress, interpolating_strain)
+    #print(weightedH2Linear)
     if not isMonotonic(sim_stress):
         return 10e12
     else:
-        # return (wh1*H1Linear(exp_stress, sim_stress, interpolating_strain) + wh2*H2Linear(exp_stress, sim_stress, interpolating_strain))
-        return wh2 * H2Linear(exp_stress, sim_stress, interpolating_strain)
+        return weightedH2Linear
+
+def lossHardeningAllLinear(exp_curves, sim_curves, loadings, weightsLoading, weightsHardening):
+    lossAllLoadings = 0
+    for loading in loadings:
+        if loading.startswith("linear"):
+            lossAllLoadings += weightsLoading[loading] * lossHardeningOneLinear(exp_curves[loading]["stress"], sim_curves[loading]["stress"], exp_curves[loading]["strain"], weightsHardening)
+    return lossAllLoadings
+
+####################################################################################################
+# Hardening objective and loss functions for one loading and all loadings for nonlinear loading #
+####################################################################################################
 
 def H1Nonlinear(exp_stress, sim_stress, interpolating_strain):
 
@@ -141,28 +147,41 @@ def H2Nonlinear(exp_stress, sim_stress, interpolating_strain):
     weighted_MSE = np.average((exp_stress_difference - sim_stress_difference)**2, weights=linearlyIncreasingWeights)
     return weighted_MSE
 
-def fitnessHardeningNonlinear(exp_stress, sim_stress, interpolating_strain, weightsHardening):
+def lossHardeningOneNonlinear(exp_stress, sim_stress, interpolating_strain, weightsHardening):
     wh1 = weightsHardening["wh1"]
     wh2 = weightsHardening["wh2"]
-    #weighted_wh1 = wh1*H1Nonlinear(exp_stress, sim_stress, interpolating_strain)
-    #weighted_wh2 = wh2*H2Nonlinear(exp_stress, sim_stress, interpolating_strain)
-    #print(weighted_wh1)
-    #print(weighted_wh2)
-    return (wh1*H1Nonlinear(exp_stress, sim_stress, interpolating_strain) + wh2*H2Nonlinear(exp_stress, sim_stress, interpolating_strain))
+    weightedH1Nonlinear = wh1*H1Nonlinear(exp_stress, sim_stress, interpolating_strain)
+    weightedH2Nonlinear = wh2*H2Nonlinear(exp_stress, sim_stress, interpolating_strain)
+    #print(weightedH1Nonlinear)
+    #print(weightedH2Nonlinear)
+    return weightedH1Nonlinear + weightedH2Nonlinear
 
-def fitnessHardeningAllLoadings(exp_curves, sim_curves, loadings, weightsLoading, weightsHardening):
-    fitnessAllLoadings = 0
+def lossHardeningAllNonlinear(exp_curves, sim_curves, loadings, weightsLoading, weightsHardening):
+    lossAllLoadings = 0
+    for loading in loadings:
+        if loading.startswith("nonlinear"):
+            lossAllLoadings += weightsLoading[loading] * lossHardeningOneNonlinear(exp_curves[loading]["stress"], sim_curves[loading]["stress"], exp_curves[loading]["strain"], weightsHardening)
+    return lossAllLoadings
+
+#########################################################
+# Hardening loss for all loadings, linear and nonlinear #
+#########################################################
+
+def lossHardeningAllLoadings(exp_curves, sim_curves, loadings, weightsLoading, weightsHardening):
+    lossAllLoadings = 0
     for loading in loadings:
         #print(loading)
         if loading.startswith("linear"):
-            #print(weightsLoading[loading] * fitnessHardeningLinear(exp_curves[loading]["stress"], sim_curves[loading]["stress"], exp_curves[loading]["strain"], weightsHardening))
-            fitnessAllLoadings += weightsLoading[loading] * fitnessHardeningLinear(exp_curves[loading]["stress"], sim_curves[loading]["stress"], exp_curves[loading]["strain"], weightsHardening)
+            weightedHardeningLoading = weightsLoading[loading] * lossHardeningOneLinear(exp_curves[loading]["stress"], sim_curves[loading]["stress"], exp_curves[loading]["strain"], weightsHardening)
+            #print(weightedHardeningLoading)
+            lossAllLoadings += weightedHardeningLoading
         else:
-            #print(weightsLoading[loading] * fitnessHardeningNonlinear(exp_curves[loading]["stress"], sim_curves[loading]["stress"], exp_curves[loading]["strain"], weightsHardening))
-            fitnessAllLoadings += weightsLoading[loading] * fitnessHardeningNonlinear(exp_curves[loading]["stress"], sim_curves[loading]["stress"], exp_curves[loading]["strain"], weightsHardening)
+            weightsHardeningLoading = weightsLoading[loading] * lossHardeningOneNonlinear(exp_curves[loading]["stress"], sim_curves[loading]["stress"], exp_curves[loading]["strain"], weightsHardening)
+            #print(weightedHardeningLoading)
+            lossAllLoadings += weightsHardeningLoading
         #time.sleep(2)
     #time.sleep(180)
-    return fitnessAllLoadings
+    return lossAllLoadings
 
 ################################################################
 # Stopping criteria functions for one loading and all loadings #
@@ -178,18 +197,8 @@ def insideYieldingDevLinear(exp_stress, sim_stress, interpolating_strain, percen
     else:
         return False
 
-# This function is actually not used in this project
-def insideYieldingDevNonlinear(exp_stress, sim_stress, interpolating_strain, percentDeviation):
-    expYieldStress = exp_stress[1]
-    simYieldStress = sim_stress[1] 
-    upper = expYieldStress * (1 + percentDeviation * 0.01) 
-    lower = expYieldStress * (1 - percentDeviation * 0.01) 
-    if simYieldStress >= lower and simYieldStress <= upper:
-        return True
-    else:
-        return False
 
-def insideYieldingDevAllLoadings(exp_curves, sim_curves, loadings, percentDeviations):
+def insideYieldingDevAllLinear(exp_curves, sim_curves, loadings, percentDeviations):
     notSatisfiedLoadings = []
     allLoadingsSatisfied = True
     for loading in loadings:
@@ -199,22 +208,10 @@ def insideYieldingDevAllLoadings(exp_curves, sim_curves, loadings, percentDeviat
         percentDeviation = percentDeviations[loading]
         if loading.startswith("linear"):
             thisLoadingSatisfied = insideYieldingDevLinear(expStress, simStress, interpolating_strain, percentDeviation)
-        else:
-            thisLoadingSatisfied = insideYieldingDevNonlinear(expStress, simStress, interpolating_strain, percentDeviation)
         allLoadingsSatisfied = allLoadingsSatisfied and thisLoadingSatisfied
         if not thisLoadingSatisfied:
             notSatisfiedLoadings.append(loading)
     return (allLoadingsSatisfied, notSatisfiedLoadings)
-
-def turningStressPoints(trueStress):
-    differences = np.diff(trueStress)
-    index = 1
-    turningIndices = []
-    while index < differences.size:
-        if (differences[index - 1] <= 0 and differences[index] >= 0) or (differences[index - 1] >= 0 and differences[index] <= 0):
-            turningIndices.append(index)
-        index += 1
-    return turningIndices
 
 def insideHardeningDevLinear(exp_stress, sim_stress, interpolating_strain, percentDeviation):
     upperStress = exp_stress * (1 + percentDeviation * 0.01) 
@@ -240,6 +237,36 @@ def insideHardeningDevNonlinear(exp_stress, sim_stress, interpolating_strain, pe
         if pruned_sim_stress[i] < pruned_lowerStress[i] or pruned_sim_stress[i] > pruned_upperStress[i]:
             return False 
     return True
+
+def insideHardeningDevAllLinear(exp_curves, sim_curves, loadings, percentDeviations):
+    notSatisfiedLoadings = []
+    allLoadingsSatisfied = True
+    for loading in loadings:
+        expStress = exp_curves[loading]['stress']
+        simStress = sim_curves[loading]['stress']
+        interpolating_strain = exp_curves[loading]['strain']
+        percentDeviation = percentDeviations[loading]
+        if loading.startswith("linear"):
+            thisLoadingSatisfied = insideHardeningDevLinear(expStress, simStress, interpolating_strain, percentDeviation)
+        allLoadingsSatisfied = allLoadingsSatisfied and thisLoadingSatisfied
+        if not thisLoadingSatisfied:
+            notSatisfiedLoadings.append(loading)
+    return (allLoadingsSatisfied, notSatisfiedLoadings)
+
+def insideHardeningDevAllNonlinear(exp_curves, sim_curves, loadings, percentDeviations):
+    notSatisfiedLoadings = []
+    allLoadingsSatisfied = True
+    for loading in loadings:
+        expStress = exp_curves[loading]['stress']
+        simStress = sim_curves[loading]['stress']
+        interpolating_strain = exp_curves[loading]['strain']
+        percentDeviation = percentDeviations[loading]
+        if loading.startswith("nonlinear"):
+            thisLoadingSatisfied = insideHardeningDevNonlinear(expStress, simStress, interpolating_strain, percentDeviation)
+        allLoadingsSatisfied = allLoadingsSatisfied and thisLoadingSatisfied
+        if not thisLoadingSatisfied:
+            notSatisfiedLoadings.append(loading)
+    return (allLoadingsSatisfied, notSatisfiedLoadings)
 
 def insideHardeningDevAllLoadings(exp_curves, sim_curves, loadings, percentDeviations):
     notSatisfiedLoadings = []

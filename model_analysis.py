@@ -5,76 +5,41 @@
 #                                                         #
 ###########################################################
 
-def main():
-
-    initial_processCurves = {}
-    initial_trueCurves = {}
-    for loading in loadings:
-        initial_processCurves[loading] = np.load(f'results/{material}/{CPLaw}/universal/{loading}/initial_processCurves.npy', allow_pickle=True).tolist()
-        initial_trueCurves[loading] = np.load(f'results/{material}/{CPLaw}/universal/{loading}/initial_trueCurves.npy', allow_pickle=True).tolist()
-    #print(initial_processCurves[example_loading][(('dipole', 5.04253), ('islip', 760.12006), ('omega', 6.15309), ('p', 0.41821), ('q', 1.68084), ('tausol', 155.32767), ('Qs', 3.72866), ('Qc', 1.703), ('v0', 38.09405), ('rho_e', 10.10506))])
-    getTargetCurves(material, CPLaw, curveIndex, loadings)
-
-    # -------------------------------------------------------------------
-    #   Step 1: Loading progress and preparing data
-    # -------------------------------------------------------------------
-
-    messages = []
-    messages.append(70 * "*" + "\n")
-    messages.append(f"Step 1: Loading progress and preparing data for curve {CPLaw}{curveIndex}\n\n")
-        
-    all_initialStrains = {}
-    all_initialStress = {}
-    average_initialStrains = {}
+def main_modelAnalysis(info, prepared_data):
     
-    # Calculating average strain from initial simulations 
-    for loading in loadings:
-        all_initialStress[loading] = np.array(list(map(lambda strainstress: strainstress["stress"], initial_processCurves[loading].values())))
-        all_initialStrains[loading] = np.array(list(map(lambda strainstress: strainstress["strain"], initial_processCurves[loading].values())))
-        average_initialStrains[loading] = all_initialStrains[loading].mean(axis=0)
-    #print(len(list(all_initialStrains[loading])))
-    #print(all_initialStress[example_loading][0])
-    exp_curves = {}
-    exp_curves["true"] = {}
-    exp_curves["process"] = {}
-    exp_curves["interpolate"] = {}
+    loadings = info['loadings']
+    CPLaw = info['CPLaw']
+    convertUnit = info['convertUnit']
+    curveIndex = info['curveIndex']
+    param_info = info['param_info']
+    material = info['material']
+    loadings = info['loadings']
+    numberOfHiddenLayers = info['numberOfHiddenLayers']
+    hiddenNodesFormula = info['hiddenNodesFormula']
+    ANNOptimizer = info['ANNOptimizer']
+    L2_regularization = info['L2_regularization']
+    learning_rate = info['learning_rate']
+    loading_epochs = info['loading_epochs']
 
-    # Loading the target curve, calculating the interpolating curve and save the compact data of target curve
-    for loading in loadings:
-        exp_trueCurve = np.load(f'targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}_true.npy', allow_pickle=True).tolist()
-        exp_processCurve = np.load(f'targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}_process.npy', allow_pickle=True).tolist()
-        # DAMASK simulated curve used as experimental curve
-        interpolatedStrain = interpolatingStrain(average_initialStrains[loading], exp_processCurve["strain"], all_initialStress[loading][0], yieldingPoints[CPLaw][loading], loading)                 
-        interpolatedStress = interpolatingStress(exp_processCurve["strain"], exp_processCurve["stress"], interpolatedStrain, loading).reshape(-1)
-        exp_interpolateCurve = {
-            "strain": interpolatedStrain,
-            "stress": interpolatedStress
-        }
-        exp_curves["true"][loading] = exp_trueCurve
-        exp_curves["process"][loading] = exp_processCurve
-        exp_curves["interpolate"][loading] = exp_interpolateCurve 
-        np.save(f"targets/{material}/{CPLaw}/{loading}/{CPLaw}{curveIndex}_interpolate.npy", exp_curves["interpolate"][loading])
-    #time.sleep(180) 
-    np.save(f"targets/{material}/{CPLaw}/{CPLaw}{curveIndex}_curves.npy", exp_curves)
 
-    # Calculating the combine interpolated curves from combine curves and derive reverse_interpolate curves
-    combine_interpolateCurves = {}
-    for loading in loadings:
-        combine_interpolateCurves[loading] = {}
-        for paramsTuple in initial_processCurves[loading]:
-            sim_strain = initial_processCurves[loading][paramsTuple]["strain"]
-            sim_stress = initial_processCurves[loading][paramsTuple]["stress"]
-            combine_interpolateCurves[loading][paramsTuple] = {}
-            combine_interpolateCurves[loading][paramsTuple]["strain"] = exp_curves["interpolate"][loading]["strain"] 
-            combine_interpolateCurves[loading][paramsTuple]["stress"] = interpolatingStress(sim_strain, sim_stress, exp_curves["interpolate"][loading]["strain"], loading).reshape(-1)
-    initial_length = len(list(combine_interpolateCurves[loading]))
-    # -------------------------------------------------------------------
-    #   Step 2: Initialize the regressors for all loadings
-    # -------------------------------------------------------------------
+    initial_length = prepared_data['initial_length']
+    combined_loadings_interpolateCurves = prepared_data['combined_loadings_interpolateCurves']
+    
 
-    messages = []
-    messages.append(70 * "*" + "\n")
-    messages.append(f"Step 2: Train the regressors for all loadings with the initial simulations of curve {CPLaw}{curveIndex}\n\n")
+    print(70 * "*" + "\n")
+    print(f"Step 2: Train the regressors for all loadings with the initial simulations of curve {CPLaw}{curveIndex}\n")
+    print(f"ANN model: (parameters) -> (stress values at interpolating strain points)\n")
+    
+    stringMessage = "ANN configuration:\n"
+
+    logTable = PrettyTable()
+    logTable.field_names = ["ANN configurations", "Choice"]
+
+    logTable.add_row(["Number of hidden layers", numberOfHiddenLayers])
+    logTable.add_row(["Hidden layer nodes formula", hiddenNodesFormula])
+    logTable.add_row(["ANN Optimizer", ANNOptimizer])
+    logTable.add_row(["Learning rate", learning_rate])
+    logTable.add_row(["L2 regularization term", L2_regularization])
 
     # The ANN regressors for each loading condition
     regressors = {}
@@ -82,17 +47,50 @@ def main():
     scalers = {}
     
     for loading in loadings:
+        logTable.add_row([f"Epochs of {loading}", loading_epochs[CPLaw][loading]])
+    
+    stringMessage += logTable.get_string()
+    stringMessage += "\n"
+
+    print(stringMessage)
+
+
+    
+    param_info_filtered = {}
+    for parameter, info in param_info.items():
+        if param_info[parameter]["optimized_target"]:
+            param_info_filtered[parameter] = info
+
+    #print(param_info)
+
+    featureMatrixScaling = np.zeros((2, len(list(param_info_filtered.keys()))))
+    powerList = np.zeros(len(list(param_info_filtered.keys())))
+    #print(featureMatrixScaling)
+    #print(param_info_filtered)
+    for index, parameter in enumerate(list(param_info_filtered.keys())):
+        # print(np.linspace(param_info[parameter]["low"], param_info[parameter]["high"], spacing - 1))
+        # print(np.linspace(param_info[parameter]["low"], param_info[parameter]["high"], spacing - 1).shape)
+        featureMatrixScaling[:, index] = np.array([param_info_filtered[parameter]["low"], param_info_filtered[parameter]["high"]])
+        powerList[index] = param_info_filtered[parameter]["power"]
+    # print(featureMatrixScaling)
+    # print(featureMatrixScaling.shape)
+    # print(powerList)
+    # print(powerList.shape)
+    #time.sleep(60)
+
+    
+    for loading in loadings:
         
-        if loading == "linear_uniaxial_RD":
-        # if loading == "linear_uniaxial_TD":
+        #if loading == "linear_uniaxial_RD":
+        #if loading == "linear_uniaxial_TD":
         #if loading == "nonlinear_biaxial_RD":
         #if loading == "nonlinear_biaxial_TD":
         #if loading == "nonlinear_planestrain_RD":
         #if loading == "nonlinear_planestrain_TD":
         #if loading == "nonlinear_uniaxial_RD":
-        #if loading == "nonlinear_uniaxial_TD": 
-            paramFeatures = np.array([list(dict(params).values()) for params in list(combine_interpolateCurves[loading].keys())])
-            stressLabels = np.array([strainstress["stress"] * 1e-6 for strainstress in list(combine_interpolateCurves[loading].values())])
+        if loading == "nonlinear_uniaxial_TD": 
+            paramFeatures = np.array([list(dict(params).values()) for params in list(combined_loadings_interpolateCurves[loading].keys())])
+            stressLabels = np.array([strainstress["stress"] for strainstress in list(combined_loadings_interpolateCurves[loading].values())])
 
 
             # Input and output size of the ANN
@@ -111,7 +109,7 @@ def main():
             stressLabels_train = stressLabels[test_size:total_length]
             
             # Normalizing the data
-            scalers[loading] = StandardScaler().fit(paramFeatures[0:total_length])
+            scalers[loading] = CustomScaler(featureMatrixScaling, powerList)
             paramFeatures_train = scalers[loading].transform(paramFeatures_train)
             paramFeatures_test = scalers[loading].transform(paramFeatures_test)
             
@@ -149,24 +147,24 @@ def main():
 
             epochs_trainingErrors = {}
             epochs_validationErrors = {}
-            increments = 1000
-            epochs = 2200
+            increments = 100
+            epochs = 100
             while epochs <= 3000:
                 print(f"Number of epochs {epochs}")
-                #regressors[loading] = NeuralNetwork(inputSize, outputSize, hiddenNodesFormula, numberOfHiddenLayers, sampleSize).to(device)
-                #trainingError = regressors[loading].train(paramFeatures_train, stressLabels_train, ANNOptimizer, learning_rate, epochs, L2_regularization)
-                #stressLabels_predict = regressors[loading].predict(paramFeatures_test)
-                #validationError = MSE_loss(stressLabels_predict, stressLabels_test)
-                regressors[loading] = NeuralNetwork(outputSize, inputSize, hiddenNodesFormula, numberOfHiddenLayers, sampleSize).to(device)
-                trainingError = regressors[loading].train(stressLabels_train, paramFeatures_train, ANNOptimizer, learning_rate, epochs, L2_regularization)
+                regressors[loading] = NeuralNetwork(inputSize, outputSize, hiddenNodesFormula, numberOfHiddenLayers, sampleSize).to(device)
+                trainingError = regressors[loading].train(paramFeatures_train, stressLabels_train, ANNOptimizer, learning_rate, epochs, L2_regularization)
+                stressLabels_predict = regressors[loading].predict(paramFeatures_test)
+                validationError = MSE_loss(stressLabels_predict, stressLabels_test)
+                # regressors[loading] = NeuralNetwork(outputSize, inputSize, hiddenNodesFormula, numberOfHiddenLayers, sampleSize).to(device)
+                # trainingError = regressors[loading].train(stressLabels_train, paramFeatures_train, ANNOptimizer, learning_rate, epochs, L2_regularization)
 
-                paramFeatures_predict = regressors[loading].predict(stressLabels_test)
-                validationError = MSE_loss(paramFeatures_predict, paramFeatures_test)
-                predictParams = regressors[loading].predictOneDimension(stressLabels[0])
-                print("True param")
-                print(paramFeatures[0])
-                print("Predicted param")
-                print(np.squeeze(scalers[loading].inverse_transform(predictParams)))
+                # paramFeatures_predict = regressors[loading].predict(stressLabels_test)
+                # validationError = MSE_loss(paramFeatures_predict, paramFeatures_test)
+                # predictParams = regressors[loading].predictOneDimension(stressLabels[0])
+                # print("True param")
+                # print(paramFeatures[0])
+                # print("Predicted param")
+                # print(np.squeeze(scalers[loading].inverse_transform(predictParams)))
                 
                 print(f"Training error: {trainingError[-1]}")
                 print(f"Validation error: {validationError}\n")
@@ -182,8 +180,8 @@ def main():
             time.sleep(30)
 
 
-    messages.append(f"The number of combined interpolate curves is {len(combine_interpolateCurves[loading])}\n\n")
-    messages.append(f"Finish training ANN for all loadings of curve {CPLaw}{curveIndex}\n\n")
+    print(f"The number of combined interpolate curves is {len(combined_loadings_interpolateCurves[loading])}\n\n")
+    print(f"Finish training ANN for all loadings of curve {CPLaw}{curveIndex}\n\n")
 
 
 if __name__ == '__main__':
@@ -197,10 +195,14 @@ if __name__ == '__main__':
     from optimizers.BO import *
     from optimizers.PSO import * 
     from optimizers.ANN import *
+    from optimizers.scaler import * 
+    import stage1_prepare_data 
     import os
     from optimize_config import *
     from sklearn.preprocessing import StandardScaler
-    main()
+    info = main_config()
+    prepared_data = stage1_prepare_data.main_prepareData(info)
+    main_modelAnalysis(info, prepared_data)
 
 # python optimize.py
 # pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu

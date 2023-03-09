@@ -51,9 +51,11 @@ def main_optimize(info):
     loadings = info['loadings']
     exampleLoading = info['exampleLoading']
     yieldingPoints = info['yieldingPoints']
-    weightsYielding = info['weightsYielding']
-    weightsHardening = info['weightsHardening']
-    weightsLoading = info['weightsLoading']
+    weightsYieldingConstitutive = info['weightsYieldingConstitutive']
+    weightsHardeningConstitutive = info['weightsHardeningConstitutive']
+    weightsYieldingLinearLoadings = info['weightsYieldingLinearLoadings']
+    weightsHardeningLinearLoadings = info['weightsHardeningLinearLoadings']
+    weightsHardeningAllLoadings = info['weightsHardeningAllLoadings']
     paramsFormatted = info['paramsFormatted']
     paramsUnit = info['paramsUnit']
     numberOfHiddenLayers = info['numberOfHiddenLayers']
@@ -79,6 +81,7 @@ def main_optimize(info):
     initial_length = prepared_data['initial_length']
     iteration_length = prepared_data['iteration_length']
     exp_curve = prepared_data['exp_curve']
+    default_curves = prepared_data['default_curves']
     initialResultPath = prepared_data['initialResultPath']
     iterationResultPath = prepared_data['iterationResultPath']
     stage_CurvesList = prepared_data['stage_CurvesList']
@@ -118,14 +121,17 @@ def main_optimize(info):
 
     stages_data = stage3_stages_analysis.main_stagesAnalysis(info, prepared_data)
 
-    deviationPercent = stages_data['deviationPercent']
-    deviationCondition = stages_data['deviationCondition']
-    optimizeParams = stages_data['optimizeParams']
-    parameterType = stages_data['parameterType']
-    optimizeType = stages_data['optimizeType']
-    ordinalUpper = stages_data['ordinalUpper']
-    ordinalLower = stages_data['ordinalLower']
-    ordinalNumber = stages_data['ordinalNumber']
+    deviationPercent_stages = stages_data['deviationPercent_stages']
+    stopFunction_stages = stages_data['stopFunction_stages']
+    lossFunction_stages = stages_data['lossFunction_stages']
+    optimizeParams_stages = stages_data['optimizeParams_stages']
+    weightsLoadings_stages = stages_data['weightsLoadings_stages']
+    weightsConstitutive_stages = stages_data['weightsConstitutive_stages']
+    parameterType_stages = stages_data['parameterType_stages']
+    optimizeType_stages = stages_data['optimizeType_stages']
+    ordinalUpper_stages = stages_data['ordinalUpper_stages']
+    ordinalLower_stages = stages_data['ordinalLower_stages']
+    ordinalNumber_stages = stages_data['ordinalNumber_stages']
 
     # -------------------------------------------------------------------
     #   Step 4: Optimize the parameters for the curves

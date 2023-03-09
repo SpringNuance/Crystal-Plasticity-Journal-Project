@@ -106,7 +106,7 @@ def main_trainANN(info, prepared_data, logging):
         printLog(f"Finish training ANN for all loadings of curve {CPLaw}{curveIndex}\n", logPath)
         printLog(f"Total training time: {round(end - start, 2)}s\n\n", logPath)
 
-    trained_ANN = {
+    trained_models = {
         "regressors": regressors,
         "scalers": scalers,
         "trainingErrors": trainingErrors,
@@ -114,7 +114,7 @@ def main_trainANN(info, prepared_data, logging):
 
     # time.sleep(180)
 
-    return trained_ANN
+    return trained_models
 
 if __name__ == '__main__':
     info = optimize_config.main_config()

@@ -30,9 +30,11 @@ def main_stagesAnalysis(info, prepared_data):
     loadings = info['loadings']
     exampleLoading = info['exampleLoading']
     yieldingPoints = info['yieldingPoints']
-    weightsYielding = info['weightsYielding']
-    weightsHardening = info['weightsHardening']
-    weightsLoading = info['weightsLoading']
+    weightsYieldingConstitutive = info['weightsYieldingConstitutive']
+    weightsHardeningConstitutive = info['weightsHardeningConstitutive']
+    weightsYieldingLinearLoadings = info['weightsYieldingLinearLoadings']
+    weightsHardeningLinearLoadings = info['weightsHardeningLinearLoadings']
+    weightsHardeningAllLoadings = info['weightsHardeningAllLoadings']
     paramsFormatted = info['paramsFormatted']
     paramsUnit = info['paramsUnit']
     numberOfHiddenLayers = info['numberOfHiddenLayers']
@@ -78,38 +80,33 @@ def main_stagesAnalysis(info, prepared_data):
         printLog(f"There are {len(nonlinearHardeningParams)} small hardening parameters\n", logPath)
         printLog("3rd stage optimization required\n\n", logPath)
 
-
-
-    yieldingDevs = {}
-    linearHardeningDevs = {}
-    nonlinearHardeningDevs = {}
-    for loading in loadings:
-        if loading.startswith("linear"):
-            yieldingDevs[loading] = linearYieldingDev
-            linearHardeningDevs[loading] = linearHardeningDev
-        else:
-            nonlinearHardeningDevs[loading] = nonlinearHardeningDev 
     # ----------------------------------------------------------------------------
     #   Four optimization stage: Optimize the parameters for the curves in parallel 
     # ----------------------------------------------------------------------------
-    deviationPercent = [yieldingDevs, linearHardeningDevs, nonlinearHardeningDevs]
-    deviationCondition = [insideYieldingDevAllLinear, insideHardeningDevAllLinear, insideHardeningDevAllLoadings]
-    optimizeParams = [yieldingParams, linearHardeningParams, nonlinearHardeningParams]
-    parameterType = ["yielding", "linear hardening", "nonlinear hardening"]
-    optimizeType = ["yielding", "hardening", "hardening"]
-    ordinalUpper = ["First", "Second", "Third"]
-    ordinalLower = ["first", "second", "third"]
-    ordinalNumber = ["1","2","3"]
+    deviationPercent_stages = [linearYieldingDev, linearHardeningDev, nonlinearHardeningDev]
+    stopFunction_stages = [insideYieldingDevAllLinear, insideHardeningDevAllLinear, insideHardeningDevAllLoadings]
+    lossFunction_stages = [lossYieldingAllLinear, lossHardeningAllLinear, lossHardeningAllLoadings]
+    optimizeParams_stages = [yieldingParams, linearHardeningParams, nonlinearHardeningParams]
+    weightsLoadings_stages = [weightsYieldingLinearLoadings, weightsHardeningLinearLoadings, weightsHardeningAllLoadings]
+    weightsConstitutive_stages = [weightsYieldingConstitutive, weightsHardeningConstitutive, weightsHardeningConstitutive]
+    parameterType_stages = ["linear yielding", "linear hardening", "all hardening"]
+    optimizeType_stages = ["linear yielding", "linear hardening", "all hardening"]
+    ordinalUpper_stages = ["First", "Second", "Third"]
+    ordinalLower_stages = ["first", "second", "third"]
+    ordinalNumber_stages = ["1","2","3"]
 
     stages_data = {
-        'deviationPercent':deviationPercent,
-        'deviationCondition':deviationCondition,
-        'optimizeParams':optimizeParams,
-        'parameterType':parameterType,
-        'optimizeType':optimizeType,
-        'ordinalUpper':ordinalUpper,
-        'ordinalLower':ordinalLower,
-        'ordinalNumber':ordinalNumber,
+        'deviationPercent_stages':deviationPercent_stages,
+        'stopFunction_stages': stopFunction_stages,
+        'lossFunction_stages': lossFunction_stages,
+        'optimizeParams_stages':optimizeParams_stages,
+        'weightsLoadings_stages': weightsLoadings_stages,
+        'weightsConstitutive_stages': weightsConstitutive_stages,
+        'parameterType_stages':parameterType_stages,
+        'optimizeType_stages':optimizeType_stages,
+        'ordinalUpper_stages':ordinalUpper_stages,
+        'ordinalLower_stages':ordinalLower_stages,
+        'ordinalNumber_stages':ordinalNumber_stages,
     }
 
     #time.sleep(180)

@@ -28,9 +28,11 @@ def main_prepareData(info):
     loadings = info['loadings']
     exampleLoading = info['exampleLoading']
     yieldingPoints = info['yieldingPoints']
-    weightsYielding = info['weightsYielding']
-    weightsHardening = info['weightsHardening']
-    weightsLoading = info['weightsLoading']
+    weightsYieldingConstitutive = info['weightsYieldingConstitutive']
+    weightsHardeningConstitutive = info['weightsHardeningConstitutive']
+    weightsYieldingLinearLoadings = info['weightsYieldingLinearLoadings']
+    weightsHardeningLinearLoadings = info['weightsHardeningLinearLoadings']
+    weightsHardeningAllLoadings = info['weightsHardeningAllLoadings']
     paramsFormatted = info['paramsFormatted']
     paramsUnit = info['paramsUnit']
     linearYieldingDev = info['linearYieldingDev']
@@ -193,7 +195,7 @@ def main_prepareData(info):
         tupleParamsStresses = list(reverse_initial_loadings_interpolateCurves.items())
         #print(tupleParamsStresses[0])
         #print(exp_curve["interpolate"])
-        sortedClosestHardening = list(sorted(tupleParamsStresses, key = lambda paramsStresses: lossHardeningAllLoadings(exp_curve["interpolate"], paramsStresses[1], loadings, weightsLoading, weightsHardening)))
+        sortedClosestHardening = list(sorted(tupleParamsStresses, key = lambda paramsStresses: lossHardeningAllLoadings(exp_curve["interpolate"], paramsStresses[1], loadings, weightsHardeningAllLoadings, weightsHardeningConstitutive)))
 
         # Obtaining the default hardening parameters
         default_params = sortedClosestHardening[0][0]
@@ -205,7 +207,7 @@ def main_prepareData(info):
         default_curves["true"] = reverse_initial_loadings_trueCurves[default_params]
         default_curves["process"] = reverse_initial_loadings_processCurves[default_params]
         default_curves["interpolate"] = reverse_initial_loadings_interpolateCurves[default_params]
-        default_curves["yielding_loss"] = calculateMSE(exp_curve["interpolate"], default_curves["interpolate"], "yielding", loadings, weightsLoading, weightsYielding, weightsHardening)
+        default_curves["yielding_loss"] = calculateMSE(exp_curve["interpolate"], default_curves["interpolate"], "yielding", loadings, weightsHardeningAllLoadings, weightsYielding, weightsHardening)
         default_curves["hardening_loss"] = calculateMSE(exp_curve["interpolate"], default_curves["interpolate"], "hardening", loadings, weightsLoading, weightsYielding, weightsHardening)
         np.save(f"{iterationResultPath}/common/default_curves.npy", default_curves)
     else:
@@ -251,6 +253,7 @@ def main_prepareData(info):
         'initial_length': initial_length,
         'iteration_length': iteration_length,
         'exp_curve': exp_curve,
+        'default_curves': default_curves,
         'initialResultPath': initialResultPath,
         'iterationResultPath': iterationResultPath,
         'stage_CurvesList': stage_CurvesList,

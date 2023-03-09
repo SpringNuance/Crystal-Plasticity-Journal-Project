@@ -81,6 +81,8 @@ def main_config():
         },
     }
 
+
+    
     convertUnit = 1e-6
 
     initialSims = dataConfig["initialSims"]  
@@ -99,15 +101,28 @@ def main_config():
 
     nonlinearHardeningDev = dataConfig["linearHardeningDev"]  
 
+
+    
+
     # Setting the weights of the two yield stress objective functions:  
-    weightsYielding = {"wy1": 0.0995, "wy2": 0.0005}
+    weightsYieldingConstitutive = {"wy1": 0.0995, "wy2": 0.0005}
 
     # Setting the weights of the two hardening objective functions:  
-    weightsHardening = {"wh1": 0.099, "wh2": 0.001}
+    weightsHardeningConstitutive = {"wh1": 0.099, "wh2": 0.001}
 
     # Setting the weights of the seven loadings in the yielding and hardening fitness function:  
+    
+    weightsYieldingLinearLoadings = {
+        "linear_uniaxial_RD": 0.5,
+        "linear_uniaxial_TD": 0.5,
+    }
 
-    weightsLoading = {
+    weightsHardeningLinearLoadings = {
+        "linear_uniaxial_RD": 0.5,
+        "linear_uniaxial_TD": 0.5,
+    }
+
+    weightsHardeningAllLoadings = {
         "linear_uniaxial_RD": 0.10, 
         "linear_uniaxial_TD": 0.09,
         "nonlinear_biaxial_RD": 0.06, 
@@ -332,39 +347,16 @@ def main_config():
     L2_regularization = 0.5
     learning_rate = 0.05
 
-    # loading_epochs = {
-    #     "PH": {
-    #         "linear_uniaxial_RD": 2300, 
-    #         "linear_uniaxial_TD": 2200,
-    #         "nonlinear_biaxial_RD": 2600, 
-    #         "nonlinear_biaxial_TD": 2200,     
-    #         "nonlinear_planestrain_RD": 2300,     
-    #         "nonlinear_planestrain_TD": 2600,     
-    #         "nonlinear_uniaxial_RD": 2600, 
-    #         "nonlinear_uniaxial_TD": 2300
-    #     },
-    #     "DB":{
-    #         "linear_uniaxial_RD": 2400, 
-    #         "linear_uniaxial_TD": 2200,
-    #         "nonlinear_biaxial_RD": 2400, 
-    #         "nonlinear_biaxial_TD": 2400,     
-    #         "nonlinear_planestrain_RD": 2400,     
-    #         "nonlinear_planestrain_TD": 2400,     
-    #         "nonlinear_uniaxial_RD": 2400, 
-    #         "nonlinear_uniaxial_TD": 2400
-    #     }
-    # }
-
     loading_epochs = {
         "PH": {
-            "linear_uniaxial_RD": 10, 
-            "linear_uniaxial_TD": 10,
-            "nonlinear_biaxial_RD": 10, 
-            "nonlinear_biaxial_TD": 10,     
-            "nonlinear_planestrain_RD": 10,     
-            "nonlinear_planestrain_TD": 10,     
-            "nonlinear_uniaxial_RD": 10, 
-            "nonlinear_uniaxial_TD": 10
+            "linear_uniaxial_RD": 2300, 
+            "linear_uniaxial_TD": 2200,
+            "nonlinear_biaxial_RD": 2600, 
+            "nonlinear_biaxial_TD": 2200,     
+            "nonlinear_planestrain_RD": 2300,     
+            "nonlinear_planestrain_TD": 2600,     
+            "nonlinear_uniaxial_RD": 2600, 
+            "nonlinear_uniaxial_TD": 2300
         },
         "DB":{
             "linear_uniaxial_RD": 2400, 
@@ -377,6 +369,29 @@ def main_config():
             "nonlinear_uniaxial_TD": 2400
         }
     }
+
+    # loading_epochs = {
+    #     "PH": {
+    #         "linear_uniaxial_RD": 10, 
+    #         "linear_uniaxial_TD": 10,
+    #         "nonlinear_biaxial_RD": 10, 
+    #         "nonlinear_biaxial_TD": 10,     
+    #         "nonlinear_planestrain_RD": 10,     
+    #         "nonlinear_planestrain_TD": 10,     
+    #         "nonlinear_uniaxial_RD": 10, 
+    #         "nonlinear_uniaxial_TD": 10
+    #     },
+    #     "DB":{
+    #         "linear_uniaxial_RD": 2400, 
+    #         "linear_uniaxial_TD": 2200,
+    #         "nonlinear_biaxial_RD": 2400, 
+    #         "nonlinear_biaxial_TD": 2400,     
+    #         "nonlinear_planestrain_RD": 2400,     
+    #         "nonlinear_planestrain_TD": 2400,     
+    #         "nonlinear_uniaxial_RD": 2400, 
+    #         "nonlinear_uniaxial_TD": 2400
+    #     }
+    # }
 
     param_info_filtered = {}
     for parameter, info in param_info.items():
@@ -393,9 +408,9 @@ def main_config():
     #print(param_info_GA)
     #print("param_info_BO is:")
     #print(param_info_BO)
-    print("param_info_PSO is:")
-    print(param_info_PSO)
-    time.sleep(180)
+    #print("param_info_PSO is:")
+    #print(param_info_PSO)
+    #time.sleep(180)
     
     info = {
         'param_info': param_info,
@@ -424,9 +439,11 @@ def main_config():
         'loadings': loadings,
         'exampleLoading': exampleLoading,
         'yieldingPoints': yieldingPoints, 
-        'weightsYielding': weightsYielding,
-        'weightsHardening': weightsHardening,
-        'weightsLoading':  weightsLoading,
+        'weightsYieldingConstitutive': weightsYieldingConstitutive,
+        'weightsHardeningConstitutive': weightsHardeningConstitutive,
+        'weightsYieldingLinearLoadings': weightsYieldingLinearLoadings,
+        'weightsHardeningLinearLoadings': weightsHardeningLinearLoadings,
+        'weightsHardeningAllLoadings': weightsHardeningAllLoadings,
         'paramsFormatted': paramsFormatted,
         'paramsUnit': paramsUnit,
         'numberOfHiddenLayers': numberOfHiddenLayers,

@@ -8,7 +8,8 @@ from torch.utils.data import DataLoader
 
 from math import *
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+#device = "cuda" if torch.cuda.is_available() else "cpu"
+device =  "cpu"
 
 def formula1(inputSize, outputSize):
     hiddenSize = ceil(2/3 * inputSize + outputSize)

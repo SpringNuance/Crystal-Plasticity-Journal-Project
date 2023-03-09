@@ -3,7 +3,7 @@ from modules.helper import *
 from modules.preprocessing import *
 import pygad
 import time
-
+import copy
 from math import *
 from optimizers.optimizer import *
 
@@ -15,8 +15,10 @@ class GA(optimizer):
     # OPTIMIZER CLASS INITIALIZATION #
     ##################################
 
-    def __init__(self, info):
+    def __init__(self, info, prepared_data, trained_models):
         self.info = info
+        self.prepared_data = prepared_data
+        self.trained_models = trained_models
         self.default_params = None
         self.optimize_params = None
         self.optimize_type = None
@@ -39,51 +41,43 @@ class GA(optimizer):
     # OPTIMIZATION FUNCTIONS #
     ##########################
 
-    def initializeOptimizer(self, default_params, optimize_params, optimize_type):
+    def initializeOptimizer(self, default_params, optimize_params, lossFunction, weightsLoadings, weightsConstitutive):
         loadings = self.info["loadings"]
-        param_info_GA_discrete = self.info["param_info_GA_discrete"] 
-        param_info_GA_continuous = self.info["param_info_GA_continuous"]
-        searchingSpace = self.info["searchingSpace"]
-        roundContinuousDecimals = self.info["roundContinuousDecimals"]
-        exp_curves = self.info["exp_curves"] 
-        regressors = self.info["regressors"]
-        scalers = self.info["scalers"]
-        weightsYielding = self.info["weightsYielding"]
-        weightsHardening = self.info["weightsHardening"]
-        weightsLoading = self.info["weightsLoading"]
+        param_info_GA = self.info["param_info_GA"] 
+        exp_curve = self.prepared_data["exp_curve"] 
+        regressors = self.trained_models["regressors"]
+        scalers = self.trained_models["scalers"]
 
-        self.default_params = default_params
-        self.optimize_params = optimize_params
-        self.optimize_type = optimize_type 
+        self.default_params = default_params # This is a dict
+        self.optimize_params = optimize_params 
 
         GA_bounds = []
         for param in self.optimize_params:
-            GA_bounds.append(param_info_GA_discrete[param])
+            GA_bounds.append(param_info_GA[param])
 
         num_genes = len(GA_bounds)
+        print(GA_bounds)
+        print(num_genes)
+        #time.sleep(30)
 
         def lossGA(solution, solution_idx):
-            default_params_dict = dict(self.default_params)
+            default_params_copy = copy.deepcopy(self.default_params)
             counter = 0
             for param in self.optimize_params:
-                default_params_dict[param] = solution[counter]
+                default_params_copy[param] = solution[counter]
                 counter += 1 
-            candidate_params = np.array(list(default_params_dict.values())) 
+            candidate_params = np.array(list(default_params_copy.values())) 
 
-            if self.optimize_type == "yielding":
-                scaledParams = scalers["linear_uniaxial_RD"].transform(candidate_params.reshape(1, -1))
-                predicted_sim_stress = regressors["linear_uniaxial_RD"].predict(scaledParams).flatten() # changing [[1,2,3...]] into [1,2,3,..]
-                loss = lossYieldingOneLinear(exp_curves["interpolate"]["linear_uniaxial_RD"]["stress"], predicted_sim_stress, exp_curves["interpolate"]["linear_uniaxial_RD"]["strain"], weightsYielding)
-            elif self.optimize_type == "hardening":
-                loss = 0
-                for loading in loadings:
+            sim_curve = {}
+            sim_curve["interpolate"] = {}
+            for loading in loadings:
+                if loading.startswith("linear"):
                     scaledParams = scalers[loading].transform(candidate_params.reshape(1, -1))
-                    predicted_sim_stress = regressors[loading].predict(scaledParams).flatten() # changing [[1,2,3...]] into [1,2,3,..]
-                    if loading == "linear_uniaxial_RD":
-                        loss += weightsLoading[loading] * lossHardeningOneLinear(exp_curves["interpolate"][loading]["stress"], predicted_sim_stress,  exp_curves["interpolate"][loading]["strain"], weightsHardening)
-                    else:
-                        loss += weightsLoading[loading] * lossHardeningOneNonlinear(exp_curves["interpolate"][loading]["stress"], predicted_sim_stress,  exp_curves["interpolate"][loading]["strain"], weightsHardening)
-  
+                    predicted_interpolate_sim_stress = regressors[loading].predict(scaledParams).flatten() # changing [[1,2,3...]] into [1,2,3,..]
+                    sim_curve["interpolate"][loading] = {}
+                    sim_curve["interpolate"][loading]["stress"] = predicted_interpolate_sim_stress
+            loss = lossFunction(exp_curve["interpolate"], sim_curve["interpolate"], loadings, weightsLoadings, weightsConstitutive)
+
             lossScore = 1/loss
             return lossScore
         
@@ -91,14 +85,13 @@ class GA(optimizer):
                             num_parents_mating=self.num_parents_mating, 
                             sol_per_pop=self.sol_per_pop, 
                             num_genes=num_genes,
-                            loss_func=lossGA,
+                            fitness_func=lossGA,
                             gene_space=GA_bounds,
                             allow_duplicate_genes=self.allow_duplicate_genes,
                             parent_selection_type=self.parent_selection_type,
                             crossover_type=self.crossover_type,
                             mutation_type=self.mutation_type,
                             mutation_num_genes=self.mutation_num_genes,
-                            keep_elitism=self.keep_elitism,
                             stop_criteria=self.stop_criteria,
                             #parallel_processing=["thread", 5],
                             )
@@ -109,10 +102,8 @@ class GA(optimizer):
 
     def outputResult(self):
         param_info = self.info["param_info"] 
-        searchingSpace = self.info["searchingSpace"]
-        roundContinuousDecimals = self.info["roundContinuousDecimals"]
 
-        solution, solution_loss, solution_idx = self.optimizer.best_solution(self.optimizer.last_generation_loss)
+        solution, solution_loss, solution_idx = self.optimizer.best_solution(self.optimizer.last_generation_fitness)
         solution_loss = 1/solution_loss
 
         solution_dict = dict(self.default_params)

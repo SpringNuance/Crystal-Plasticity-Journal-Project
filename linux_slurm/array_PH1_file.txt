@@ -1,7 +1,8 @@
-/home/springnuance/Desktop/Crystal-Plasticity-COE-Course/simulations/RVE_1_40_D/PH/PH1_PSO_continuous/linear_uniaxial_RD/1
-/home/springnuance/Desktop/Crystal-Plasticity-COE-Course/simulations/RVE_1_40_D/PH/PH1_PSO_continuous/nonlinear_biaxial_RD/1
-/home/springnuance/Desktop/Crystal-Plasticity-COE-Course/simulations/RVE_1_40_D/PH/PH1_PSO_continuous/nonlinear_biaxial_TD/1
-/home/springnuance/Desktop/Crystal-Plasticity-COE-Course/simulations/RVE_1_40_D/PH/PH1_PSO_continuous/nonlinear_planestrain_RD/1
-/home/springnuance/Desktop/Crystal-Plasticity-COE-Course/simulations/RVE_1_40_D/PH/PH1_PSO_continuous/nonlinear_planestrain_TD/1
-/home/springnuance/Desktop/Crystal-Plasticity-COE-Course/simulations/RVE_1_40_D/PH/PH1_PSO_continuous/nonlinear_uniaxial_RD/1
-/home/springnuance/Desktop/Crystal-Plasticity-COE-Course/simulations/RVE_1_40_D/PH/PH1_PSO_continuous/nonlinear_uniaxial_TD/1
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project/simulations/RVE_1_40_D/PH/PH1_GA/linear_uniaxial_RD/1
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project/simulations/RVE_1_40_D/PH/PH1_GA/linear_uniaxial_TD/1
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project/simulations/RVE_1_40_D/PH/PH1_GA/nonlinear_biaxial_RD/1
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project/simulations/RVE_1_40_D/PH/PH1_GA/nonlinear_biaxial_TD/1
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project/simulations/RVE_1_40_D/PH/PH1_GA/nonlinear_planestrain_RD/1
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project/simulations/RVE_1_40_D/PH/PH1_GA/nonlinear_planestrain_TD/1
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project/simulations/RVE_1_40_D/PH/PH1_GA/nonlinear_uniaxial_RD/1
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project/simulations/RVE_1_40_D/PH/PH1_GA/nonlinear_uniaxial_TD/1

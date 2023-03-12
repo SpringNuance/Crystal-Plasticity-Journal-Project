@@ -33,23 +33,15 @@ class SIM:
     # INITIAL SIMULATIONS #
     #######################
 
-    def run_initial_simulations(self, dictParams = None):
+    def run_initial_simulations(self, dictParamsList):
         material = self.info["material"]
         CPLaw = self.info['CPLaw']
         loadings = self.info['loadings']
+        
         self.simulationPath = f"simulations/{material}/{CPLaw}/universal"
         self.resultPath = f"results/{material}/{CPLaw}/universal"
 
-        if self.info["method"] == "auto":
-            self.initial_params = self.latin_hypercube_sampling(self.info["initialSims"])
-            for loading in loadings:
-                np.save(f"{self.resultPath}/initial_params.npy", self.initial_params)
-            np.save(f"manualParams/{material}/{CPLaw}/initial_params.npy", self.initial_params)
-            print("\nInitial parameters generated")
-            time.sleep(30)
-        elif self.info["method"] == "manual":
-            self.initial_params = dictParams
-            np.save(f"{self.resultPath}/initial_params.npy", self.initial_params)
+        self.initial_params = dictParamsList
 
         for loading in loadings:
             self.path2params[loading] = {}
@@ -59,8 +51,7 @@ class SIM:
             self.fileIndex = 0
             for params in self.initial_params:
                 self.fileIndex += 1
-                fileIndex = str(self.fileIndex)
-                self.make_new_initial_job(params, loading, fileIndex)
+                self.make_new_initial_job(params, loading, str(self.fileIndex))
         self.submit_initial_jobs()
         self.save_initial_outputs()
 
@@ -100,7 +91,7 @@ class SIM:
             # Saving nonconvergin params
             for index in nonconvergings:
                 self.nonconvergingParams.add(tuple(self.path2params[exampleLoading][str(index)].items()))
-            np.save(f'{self.resultPath}/nonconverging_params.npy', self.nonconvergingParams)
+            np.save(f'{self.resultPath}/common/nonconverging_params.npy', self.nonconvergingParams)
             
             # If all loadings successfully converge then this should be empty list
             if len(nonconvergings) == 0:
@@ -114,7 +105,7 @@ class SIM:
             self.regenerate(nonconvergings, new_params)
 
             # Saving new params and nonconverging params
-            np.save(f'{self.resultPath}/initial_params.npy', list(self.path2params[exampleLoading].values()))
+            np.save(f'{self.resultPath}/common/initial_params.npy', list(self.path2params[exampleLoading].values()))
 
             #someIndices = self.jobIndices(nonconvergings, "some")
 
@@ -226,7 +217,7 @@ class SIM:
         material = self.info["material"]
         exampleLoading = self.info["exampleLoading"]
         convertUnit = self.info["convertUnit"]
-        np.save(f'{self.resultPath}/initial_params.npy', list(self.path2params[exampleLoading].values()))
+        np.save(f'{self.resultPath}/common/initial_params.npy', list(self.path2params[exampleLoading].values()))
         for loading in loadings:
             self.initial_trueCurves[loading] = {}
             self.initial_processCurves[loading] = {}
@@ -247,9 +238,6 @@ class SIM:
                 self.initial_trueCurves[loading][tuple(params.items())] = trueCurves
             np.save(f"{self.resultPath}/{loading}/initial_processCurves.npy", self.initial_processCurves[loading])
             np.save(f"{self.resultPath}/{loading}/initial_trueCurves.npy", self.initial_trueCurves[loading]) 
-
-        np.save(f"{self.resultPath}/initial_allLoadings_processCurves.npy", self.initial_processCurves)
-        np.save(f"{self.resultPath}/initial_allLoadings_trueCurves.npy", self.initial_trueCurves) 
 
     #########################
     # ITERATION SIMULATIONS #
@@ -435,11 +423,9 @@ class SIM:
         np.random.seed(20)
         param_info = self.info["param_info"]
         #print(param_info)
-
-
         linspaceValues = {}
         for param in param_info:
-            linspaceValues[param] = np.linspace(param_info[param]["low"], param_info[param]["high"], num = self.info["initialSims"])
+            linspaceValues[param] = np.linspace(param_info[param]["low"], param_info[param]["high"], num = self.info["initialSimsSpacing"])
             linspaceValues[param] = linspaceValues[param].tolist()   
         for _ in range(numberOfSims):
             while True:

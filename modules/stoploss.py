@@ -43,12 +43,17 @@ linearStep = 0
 def Y1Linear(interpolate_exp_stress, interpolate_sim_stress, interpolating_strain):
     expYieldStress = interpolate_exp_stress[1]
     simYieldStress = interpolate_sim_stress[1] 
-    return abs(expYieldStress - simYieldStress) 
+    #return abs(expYieldStress - simYieldStress) 
+    maxYieldStress = max(expYieldStress, simYieldStress)
+    minYieldStress = min(expYieldStress, simYieldStress)
+    return abs(1 - abs(minYieldStress/maxYieldStress)) 
 
 def Y2Linear(interpolate_exp_stress, interpolate_sim_stress, interpolating_strain):
     expSlope = (interpolate_exp_stress[2] - interpolate_exp_stress[0]) /(interpolating_strain[2] - interpolating_strain[0])
     simSlope = (interpolate_sim_stress[2] - interpolate_sim_stress[0]) /(interpolating_strain[2] - interpolating_strain[0])
-    return abs(1 - abs(expSlope/simSlope)) 
+    maxSlope = max(expSlope, simSlope)
+    minSlope = min(expSlope, simSlope)
+    return abs(1 - abs(minSlope/maxSlope)) 
 
 def lossYieldingOneLinear(interpolate_exp_stress, interpolate_sim_stress, interpolating_strain, weightsYieldingConstitutive):
     wy1 = weightsYieldingConstitutive["wy1"]
@@ -60,7 +65,10 @@ def lossYieldingOneLinear(interpolate_exp_stress, interpolate_sim_stress, interp
         weightedY2Linear = wy2 * Y2Linear(interpolate_exp_stress, interpolate_sim_stress, interpolating_strain)
         #print(weightedY1Linear)
         #print(weightedY2Linear)
-        #time.sleep(2)
+        #print("----")
+        #print(Y1Linear(interpolate_exp_stress, interpolate_sim_stress, interpolating_strain))
+        #print(Y2Linear(interpolate_exp_stress, interpolate_sim_stress, interpolating_strain))
+        #time.sleep(1)
         return weightedY1Linear + weightedY2Linear
 
 def lossYieldingAllLinear(interpolate_exp_curve, interpolate_sim_curve, loadings, weightsYieldingLinearLoadings, weightsYieldingConstitutive):
@@ -75,31 +83,35 @@ def lossYieldingAllLinear(interpolate_exp_curve, interpolate_sim_curve, loadings
 #################################################################################################
 
 def H1Linear(interpolate_exp_stress, interpolate_sim_stress, interpolating_strain):
-    linearlyIncreasingWeights = [] 
+    weights = [] 
     counter = 0
     for _ in range(len(interpolating_strain)):
-        linearlyIncreasingWeights.append(1 + counter)
+        weights.append(1 + counter)
         counter += linearStep
-    weighted_MSE = np.average((interpolate_exp_stress - interpolate_sim_stress) ** 2, weights=linearlyIncreasingWeights)
+    weighted_MSE = np.average((interpolate_exp_stress - interpolate_sim_stress) ** 2, weights=weights)
     return weighted_MSE
 
 def H2Linear(interpolate_exp_stress, interpolate_sim_stress, interpolating_strain): 
-    linearlyIncreasingWeights = [] 
+    weights = [] 
     counter = 0
     for _ in range(len(interpolating_strain) - 1):
-        linearlyIncreasingWeights.append(1 + counter)
+        weights.append(1 + counter)
         counter += linearStep
 
     diffStrain = np.diff(interpolating_strain)
+    ones_1D = np.ones(diffStrain.size)
     exp_stress_difference = np.diff(interpolate_exp_stress)/diffStrain  
     sim_stress_difference = np.diff(interpolate_sim_stress)/diffStrain
-    weighted_MSE = np.average((exp_stress_difference - sim_stress_difference) ** 2, weights=linearlyIncreasingWeights)
+    maximum_slopes = np.maximum(exp_stress_difference, sim_stress_difference)
+    minimum_slopes = np.minimum(exp_stress_difference, sim_stress_difference)
+    weighted_MSE = np.average(np.abs(ones_1D - np.abs(minimum_slopes/maximum_slopes)), weights=weights)
     return weighted_MSE
 
 def lossHardeningOneLinear(interpolate_exp_stress, interpolate_sim_stress, interpolating_strain, weightsHardeningConstitutive):   
     wh2 = weightsHardeningConstitutive["wh2"]
     weightedH2Linear = wh2 * H2Linear(interpolate_exp_stress, interpolate_sim_stress, interpolating_strain)
-    #print(weightedH2Linear)
+    #print(H2Linear(interpolate_exp_stress, interpolate_sim_stress, interpolating_strain))
+    #time.sleep(1)
     if not isMonotonic(interpolate_sim_stress):
         return 10e12
     else:
@@ -120,31 +132,37 @@ def H1Nonlinear(interpolate_exp_stress, interpolate_sim_stress, interpolating_st
 
     BauschingerIndex = getIndexBeforeStrainLevel(interpolating_strain, interpolating_strain[0] + BauschingerRange)
 
-    linearlyIncreasingWeights = [] 
+    weights = [] 
     for _ in range(0, BauschingerIndex + 1):
-        linearlyIncreasingWeights.append(BauschingerWeight)
+        weights.append(BauschingerWeight)
     counter = 0
     for _ in range(BauschingerIndex + 1, len(interpolating_strain)):
-        linearlyIncreasingWeights.append(1 + counter)
+        weights.append(1 + counter)
         counter += linearStep
-    weighted_MSE = np.average((interpolate_exp_stress - interpolate_sim_stress) ** 2, weights=linearlyIncreasingWeights)
+    ones_1D = np.ones(len(interpolating_strain))
+    maximum_stress = np.maximum(interpolate_exp_stress, interpolate_sim_stress)
+    minimum_stress = np.minimum(interpolate_exp_stress, interpolate_sim_stress)
+    weighted_MSE = np.average(np.abs(ones_1D - np.abs(minimum_stress/maximum_stress)), weights=weights)
     return weighted_MSE
     
 def H2Nonlinear(interpolate_exp_stress, interpolate_sim_stress, interpolating_strain): 
     BauschingerIndex = getIndexBeforeStrainLevel(interpolating_strain, interpolating_strain[0] + BauschingerRange)
-    linearlyIncreasingWeights = [] 
+    weights = [] 
     
     for _ in range(0, BauschingerIndex + 1):
-        linearlyIncreasingWeights.append(BauschingerWeight)
+        weights.append(BauschingerWeight)
     counter = 0
     for _ in range(BauschingerIndex + 1, len(interpolating_strain) - 1):
-        linearlyIncreasingWeights.append(1)
+        weights.append(1)
         counter += linearStep
     
     diffStrain = np.diff(interpolating_strain)
+    ones_1D = np.ones(diffStrain.size)
     exp_stress_difference = np.diff(interpolate_exp_stress)/diffStrain  
     sim_stress_difference = np.diff(interpolate_sim_stress)/diffStrain
-    weighted_MSE = np.average((exp_stress_difference - sim_stress_difference)**2, weights=linearlyIncreasingWeights)
+    maximum_slopes = np.maximum(exp_stress_difference, sim_stress_difference)
+    minimum_slopes = np.minimum(exp_stress_difference, sim_stress_difference)
+    weighted_MSE = np.average(np.abs(ones_1D - np.abs(minimum_slopes/maximum_slopes)), weights=weights)
     return weighted_MSE
 
 def lossHardeningOneNonlinear(interpolate_exp_stress, interpolate_sim_stress, interpolating_strain, weightsHardeningConstitutive):
@@ -152,6 +170,10 @@ def lossHardeningOneNonlinear(interpolate_exp_stress, interpolate_sim_stress, in
     wh2 = weightsHardeningConstitutive["wh2"]
     weightedH1Nonlinear = wh1*H1Nonlinear(interpolate_exp_stress, interpolate_sim_stress, interpolating_strain)
     weightedH2Nonlinear = wh2*H2Nonlinear(interpolate_exp_stress, interpolate_sim_stress, interpolating_strain)
+    #print(H1NonLinear(interpolate_exp_stress, interpolate_sim_stress, interpolating_strain))
+    #time.sleep(1)
+    #print(H2NonLinear(interpolate_exp_stress, interpolate_sim_stress, interpolating_strain))
+    #time.sleep(1)
     #print(weightedH1Nonlinear)
     #print(weightedH2Nonlinear)
     return weightedH1Nonlinear + weightedH2Nonlinear

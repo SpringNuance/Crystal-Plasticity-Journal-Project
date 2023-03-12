@@ -122,31 +122,37 @@ def param_infos_PSO_high_func(param_infos):
 # Calculate loss functions in a dictionary #
 ###############################################
 
-def calculateMSE(exp_interpolateCurves, sim_interpolateCurves, optimize_type, loadings, weightsLoading, weightsYielding, weightsHardening):
-    MSE = {}
-    if optimize_type == "yielding":
-        MSE["weighted_total_loss"] = lossYieldingAllLinear(exp_interpolateCurves, sim_interpolateCurves, loadings, weightsLoading, weightsYielding)
-        for loading in loadings:
-            if loading.startswith("linear"):
-                MSE[loading] = {}
-                MSE[loading]["Y1"] = Y1Linear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"])
-                MSE[loading]["Y2"] = Y2Linear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"])
-                MSE[loading]["weighted_loading_loss"] = lossYieldingOneLinear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"], weightsYielding)
-    
-    if optimize_type == "hardening":
-        MSE["weighted_total_MSE"] = lossHardeningAllLoadings(exp_interpolateCurves, sim_interpolateCurves, loadings, weightsLoading, weightsHardening)
-        for loading in loadings:
-            if loading.startswith("linear"):
-                MSE[loading] = {}
-                MSE[loading]["H1"] = H1Linear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"])
-                MSE[loading]["H2"] = H2Linear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"])
-                MSE[loading]["weighted_loading_MSE"] = lossHardeningOneLinear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"], weightsHardening)
-            else:
-                MSE[loading] = {}
-                MSE[loading]["H1"] = H1Nonlinear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"])
-                MSE[loading]["H2"] = H2Nonlinear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"])
-                MSE[loading]["weighted_loading_MSE"] = lossHardeningOneNonlinear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"], weightsHardening)
-    return MSE
+def calculateYieldingLoss(exp_interpolateCurves, sim_interpolateCurves, loadings):
+    loss = {}
+    loss["optimizingType"] = "yielding"
+    loss["total_loadings_loss"] = 0
+    for loading in loadings:
+        if loading.startswith("linear"):
+            loss[loading] = {}
+            loss[loading]["Y1"] = Y1Linear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"])
+            loss[loading]["Y2"] = Y2Linear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"])
+            loss[loading]["total_loading_loss"] = loss[loading]["Y1"] + loss[loading]["Y2"]
+            loss["total_loadings_loss"] = loss["total_loadings_loss"] + loss[loading]["total_loading_loss"]
+    return loss
+
+def calculateHardeningLoss(exp_interpolateCurves, sim_interpolateCurves, loadings):
+    loss = {}
+    loss["optimizingType"] = "hardening"
+    loss["total_loadings_loss"] = 0
+    for loading in loadings:
+        if loading.startswith("linear"):
+            loss[loading] = {}
+            loss[loading]["H1"] = H1Linear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"])
+            loss[loading]["H2"] = H2Linear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"])
+            loss[loading]["total_loading_loss"] = loss[loading]["H1"] + loss[loading]["H2"]
+            loss["total_loadings_loss"] = loss["total_loadings_loss"] + loss[loading]["total_loading_loss"]
+        else:
+            loss[loading] = {}
+            loss[loading]["H1"] = H1Nonlinear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"])
+            loss[loading]["H2"] = H2Nonlinear(exp_interpolateCurves[loading]["stress"], sim_interpolateCurves[loading]["stress"], exp_interpolateCurves[loading]["strain"])
+            loss[loading]["total_loading_loss"] = loss[loading]["H1"] + loss[loading]["H2"]
+            loss["total_loadings_loss"] = loss["total_loadings_loss"] + loss[loading]["total_loading_loss"]
+    return loss
 
 def printTupleParametersClean(parameters_tuple, param_info, paramsUnit, CPLaw, logPath):
     logTable = PrettyTable()

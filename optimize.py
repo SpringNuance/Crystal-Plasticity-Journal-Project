@@ -31,6 +31,7 @@ def main_optimize(info):
     loadings = info['loadings']
     CPLaw = info['CPLaw']
     convertUnit = info['convertUnit']
+    initialSimsSpacing = info['initialSimsSpacing']
     initialSims = info['initialSims']
     curveIndex = info['curveIndex']
     projectPath = info['projectPath']
@@ -81,7 +82,6 @@ def main_optimize(info):
     initial_length = prepared_data['initial_length']
     iteration_length = prepared_data['iteration_length']
     exp_curve = prepared_data['exp_curve']
-    default_curves = prepared_data['default_curves']
     initialResultPath = prepared_data['initialResultPath']
     iterationResultPath = prepared_data['iterationResultPath']
     stage_CurvesList = prepared_data['stage_CurvesList']
@@ -114,6 +114,7 @@ def main_optimize(info):
     regressors = trained_models["regressors"]
     scalers = trained_models["scalers"]
     trainingErrors = trained_models["trainingErrors"]
+    default_curve = trained_models['default_curve']
 
     # -------------------------------------------------------------------
     #   Step 3: Analyzing the optimization stages

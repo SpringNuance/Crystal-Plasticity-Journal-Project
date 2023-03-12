@@ -191,32 +191,7 @@ def main_prepareData(info):
     
     printLog(logTable.get_string() + "\n\n", logPath)
 
-    if not os.path.exists(f"{iterationResultPath}/common/default_curves.npy"):
-        tupleParamsStresses = list(reverse_initial_loadings_interpolateCurves.items())
-        #print(tupleParamsStresses[0])
-        #print(exp_curve["interpolate"])
-        sortedClosestHardening = list(sorted(tupleParamsStresses, key = lambda paramsStresses: lossHardeningAllLoadings(exp_curve["interpolate"], paramsStresses[1], loadings, weightsHardeningAllLoadings, weightsHardeningConstitutive)))
 
-        # Obtaining the default hardening parameters
-        default_params = sortedClosestHardening[0][0]
-        default_curves = {}
-        default_curves["iteration"] = 0
-        default_curves["stage"] = 0
-        default_curves["parameters_tuple"] = default_params
-        default_curves["parameters_dict"] = dict(default_params)
-        default_curves["true"] = reverse_initial_loadings_trueCurves[default_params]
-        default_curves["process"] = reverse_initial_loadings_processCurves[default_params]
-        default_curves["interpolate"] = reverse_initial_loadings_interpolateCurves[default_params]
-        default_curves["yielding_loss"] = calculateMSE(exp_curve["interpolate"], default_curves["interpolate"], "yielding", loadings, weightsHardeningAllLoadings, weightsYielding, weightsHardening)
-        default_curves["hardening_loss"] = calculateMSE(exp_curve["interpolate"], default_curves["interpolate"], "hardening", loadings, weightsLoading, weightsYielding, weightsHardening)
-        np.save(f"{iterationResultPath}/common/default_curves.npy", default_curves)
-    else:
-        default_curves = np.load(f"{iterationResultPath}/common/default_curves.npy", allow_pickle=True).tolist()
-        printLog("The file default_curves.npy exists. Loading the default curves\n", logPath)
-
-    printLog(f"The default parameters for the optimization of curve {CPLaw}{curveIndex}\n", logPath)
-    
-    printTupleParametersClean(default_curves["parameters_tuple"], param_info, paramsUnit, CPLaw, logPath)
 
     # Length of initial and iteration simulations
     initial_length = len(reverse_initial_loadings_processCurves)
@@ -253,7 +228,6 @@ def main_prepareData(info):
         'initial_length': initial_length,
         'iteration_length': iteration_length,
         'exp_curve': exp_curve,
-        'default_curves': default_curves,
         'initialResultPath': initialResultPath,
         'iterationResultPath': iterationResultPath,
         'stage_CurvesList': stage_CurvesList,

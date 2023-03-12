@@ -45,12 +45,12 @@ def main_config():
     loadings = [
                 "linear_uniaxial_RD", 
                 "linear_uniaxial_TD",
-                "nonlinear_biaxial_RD", 
-                "nonlinear_biaxial_TD",     
-                "nonlinear_planestrain_RD",     
-                "nonlinear_planestrain_TD",     
-                "nonlinear_uniaxial_RD", 
-                "nonlinear_uniaxial_TD"
+                #"nonlinear_biaxial_RD", 
+                #"nonlinear_biaxial_TD",     
+                #"nonlinear_planestrain_RD",     
+                #"nonlinear_planestrain_TD",     
+                #"nonlinear_uniaxial_RD", 
+                #"nonlinear_uniaxial_TD"
                 ]
 
     exampleLoading = loadings[0]
@@ -85,6 +85,8 @@ def main_config():
     
     convertUnit = 1e-6
 
+    initialSimsSpacing = dataConfig["initialSimsSpacing"] 
+
     initialSims = dataConfig["initialSims"]  
 
     method = dataConfig["method"]  
@@ -105,10 +107,10 @@ def main_config():
     
 
     # Setting the weights of the two yield stress objective functions:  
-    weightsYieldingConstitutive = {"wy1": 0.0995, "wy2": 0.0005}
+    weightsYieldingConstitutive = {"wy1": 0.95, "wy2": 0.05}
 
     # Setting the weights of the two hardening objective functions:  
-    weightsHardeningConstitutive = {"wh1": 0.099, "wh2": 0.001}
+    weightsHardeningConstitutive = {"wh1": 0.9, "wh2": 0.1}
 
     # Setting the weights of the seven loadings in the yielding and hardening fitness function:  
     
@@ -393,6 +395,21 @@ def main_config():
     #     }
     # }
 
+    # key * value must be <= 200 (Maximum batch job submission on CSC)
+    # key is the number of loadings
+    # value is the number of simulations per loading. Should be multiple of 5s
+    
+    # loadingInitialSimDivision = {
+    #     1: 200, 
+    #     2: 100,
+    #     3: 60, 
+    #     4: 50,     
+    #     5: 40,     
+    #     6: 30,     
+    #     7: 25, 
+    #     8: 25,
+    # }
+
     param_info_filtered = {}
     for parameter, info in param_info.items():
         if param_info[parameter]["optimized_target"]:
@@ -420,6 +437,7 @@ def main_config():
         'CPLaw': CPLaw,
         'convertUnit': convertUnit,
         'initialSims': initialSims,
+        'initialSimsSpacing': initialSimsSpacing,
         'curveIndex': curveIndex,
         'projectPath': projectPath,
         'optimizeStrategy': optimizeStrategy,

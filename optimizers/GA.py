@@ -56,8 +56,8 @@ class GA(optimizer):
             GA_bounds.append(param_info_GA[param])
 
         num_genes = len(GA_bounds)
-        print(GA_bounds)
-        print(num_genes)
+        #print(GA_bounds)
+        #print(num_genes)
         #time.sleep(30)
 
         def lossGA(solution, solution_idx):

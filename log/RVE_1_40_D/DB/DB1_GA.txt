@@ -1,0 +1,116 @@
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+-----------------------+
+|       Configurations      |      User choice      |
++---------------------------+-----------------------+
+|           Server          |         mahti         |
+| Initial simulation number |          2000         |
+| Initial simulation method |        manual         |
+|      Searching space      |        discrete       |
+|          Material         |       RVE_1_40_D      |
+|   Crystal plasticity law  | dislocation-based law |
+|         Optimizer         |           GA          |
+|   Optimization strategy   |          SOO          |
+|        Target curve       |          DB1          |
+|     Rounding decimals     |           3           |
+|    Linear yielding dev    |          0.5%         |
+|    Linear hardening dev   |           2%          |
+|  Nonlinear hardening dev  |           1%          |
++---------------------------+-----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Loadings not having initial simulations:linear_uniaxial_RDlinear_uniaxial_TDnonlinear_biaxial_RDnonlinear_biaxial_TDnonlinear_planestrain_RDnonlinear_planestrain_TDnonlinear_uniaxial_RDnonlinear_uniaxial_TDStarting initial simulations
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+-----------------------+
+|       Configurations      |      User choice      |
++---------------------------+-----------------------+
+|           Server          |         mahti         |
+| Initial simulation number |          500          |
+| Initial simulation method |        manual         |
+|      Searching space      |        discrete       |
+|          Material         |       RVE_1_40_D      |
+|   Crystal plasticity law  | dislocation-based law |
+|         Optimizer         |           GA          |
+|   Optimization strategy   |          SOO          |
+|        Target curve       |          DB1          |
+|     Rounding decimals     |           3           |
+|    Linear yielding dev    |          0.5%         |
+|    Linear hardening dev   |           2%          |
+|  Nonlinear hardening dev  |           1%          |
++---------------------------+-----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Loadings not having initial simulations:linear_uniaxial_RDlinear_uniaxial_TDnonlinear_biaxial_RDnonlinear_biaxial_TDnonlinear_planestrain_RDnonlinear_planestrain_TDnonlinear_uniaxial_RDnonlinear_uniaxial_TDStarting initial simulations
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+-----------------------+
+|       Configurations      |      User choice      |
++---------------------------+-----------------------+
+|           Server          |         mahti         |
+| Initial simulation number |          500          |
+| Initial simulation method |        manual         |
+|      Searching space      |        discrete       |
+|          Material         |       RVE_1_40_D      |
+|   Crystal plasticity law  | dislocation-based law |
+|         Optimizer         |           GA          |
+|   Optimization strategy   |          SOO          |
+|        Target curve       |          DB1          |
+|     Rounding decimals     |           3           |
+|    Linear yielding dev    |          0.5%         |
+|    Linear hardening dev   |           2%          |
+|  Nonlinear hardening dev  |           1%          |
++---------------------------+-----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Loadings not having initial simulations:linear_uniaxial_RDlinear_uniaxial_TDnonlinear_biaxial_RDnonlinear_biaxial_TDnonlinear_planestrain_RDnonlinear_planestrain_TDnonlinear_uniaxial_RDnonlinear_uniaxial_TDStarting initial simulations
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+-----------------------+
+|       Configurations      |      User choice      |
++---------------------------+-----------------------+
+|           Server          |         mahti         |
+| Initial simulation number |          500          |
+| Initial simulation method |        manual         |
+|      Searching space      |        discrete       |
+|          Material         |       RVE_1_40_D      |
+|   Crystal plasticity law  | dislocation-based law |
+|         Optimizer         |           GA          |
+|   Optimization strategy   |          SOO          |
+|        Target curve       |          DB1          |
+|     Rounding decimals     |           3           |
+|    Linear yielding dev    |          0.5%         |
+|    Linear hardening dev   |           2%          |
+|  Nonlinear hardening dev  |           1%          |
++---------------------------+-----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Loadings not having initial simulations:linear_uniaxial_RDlinear_uniaxial_TDnonlinear_biaxial_RDnonlinear_biaxial_TDnonlinear_planestrain_RDnonlinear_planestrain_TDnonlinear_uniaxial_RDnonlinear_uniaxial_TDStarting initial simulations

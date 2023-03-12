@@ -24,6 +24,7 @@ def main_trainANN(info, prepared_data, logging):
     curveIndex = info['curveIndex']
     param_info = info['param_info']
     param_info_filtered = info['param_info_filtered']
+    paramsUnit = info['paramsUnit']
     material = info['material']
     loadings = info['loadings']
     numberOfHiddenLayers = info['numberOfHiddenLayers']
@@ -33,10 +34,25 @@ def main_trainANN(info, prepared_data, logging):
     learning_rate = info['learning_rate']
     loading_epochs = info['loading_epochs']
 
+    weightsYieldingConstitutive = info['weightsYieldingConstitutive']
+    weightsHardeningConstitutive = info['weightsHardeningConstitutive']
+    weightsYieldingLinearLoadings = info['weightsYieldingLinearLoadings']
+    weightsHardeningLinearLoadings = info['weightsHardeningLinearLoadings']
+    weightsHardeningAllLoadings = info['weightsHardeningAllLoadings']
 
     initial_length = prepared_data['initial_length']
     combined_loadings_interpolateCurves = prepared_data['combined_loadings_interpolateCurves']
-    
+    exp_curve = prepared_data['exp_curve']
+
+    iterationResultPath = prepared_data['iterationResultPath']
+
+    initial_loadings_trueCurves = prepared_data['initial_loadings_trueCurves']
+    initial_loadings_processCurves = prepared_data['initial_loadings_processCurves']
+    initial_loadings_interpolateCurves = prepared_data['initial_loadings_interpolateCurves']
+    reverse_initial_loadings_trueCurves = prepared_data['reverse_initial_loadings_trueCurves']
+    reverse_initial_loadings_processCurves = prepared_data['reverse_initial_loadings_processCurves']
+    reverse_initial_loadings_interpolateCurves = prepared_data['reverse_initial_loadings_interpolateCurves']
+
     if logging:
         printLog("\n" + 70 * "*" + "\n\n", logPath)
         printLog(f"Step 2: Train the regressors for all loadings with the initial simulations of curve {CPLaw}{curveIndex}\n", logPath)
@@ -90,7 +106,7 @@ def main_trainANN(info, prepared_data, logging):
         sampleSize = stressLabels.shape[0]
         inputSize = paramFeatures.shape[1]
         outputSize = stressLabels.shape[1]
-
+        
         regressors[loading] = NeuralNetwork(inputSize, outputSize, hiddenNodesFormula, numberOfHiddenLayers, sampleSize).to(device)
         trainingErrors[loading] = regressors[loading].train(paramFeatures, stressLabels, ANNOptimizer, learning_rate, loading_epochs[CPLaw][loading], L2_regularization)
         if logging:
@@ -106,13 +122,59 @@ def main_trainANN(info, prepared_data, logging):
         printLog(f"Finish training ANN for all loadings of curve {CPLaw}{curveIndex}\n", logPath)
         printLog(f"Total training time: {round(end - start, 2)}s\n\n", logPath)
 
+    if not os.path.exists(f"{iterationResultPath}/common/default_curve.npy"):
+        tupleParamsStresses = list(reverse_initial_loadings_interpolateCurves.items())
+        #print(tupleParamsStresses[0])
+        #print(exp_curve["interpolate"])
+        #sortedClosestHardening = list(sorted(tupleParamsStresses, key = lambda paramsStresses: lossYieldingAllLinear(exp_curve["interpolate"], paramsStresses[1], loadings, weightsYieldingLinearLoadings, weightsYieldingConstitutive)))
+        sortedClosestHardening = list(sorted(tupleParamsStresses, key = lambda paramsStresses: lossHardeningAllLoadings(exp_curve["interpolate"], paramsStresses[1], loadings, weightsHardeningAllLoadings, weightsHardeningConstitutive)))
+
+        # Obtaining the default hardening parameters
+        default_params = sortedClosestHardening[0][0]
+        default_curve = {}
+        default_curve["iteration"] = 0
+        default_curve["stage"] = 0
+        default_curve["parameters_tuple"] = default_params
+        default_curve["parameters_dict"] = dict(default_params)
+        default_curve["true"] = reverse_initial_loadings_trueCurves[default_params]
+        default_curve["process"] = reverse_initial_loadings_processCurves[default_params]
+        default_curve["interpolate"] = reverse_initial_loadings_interpolateCurves[default_params]
+        default_curve["true_yielding_loss"] = calculateYieldingLoss(exp_curve["interpolate"], default_curve["interpolate"], loadings)
+        default_curve["true_hardening_loss"] = calculateHardeningLoss(exp_curve["interpolate"], default_curve["interpolate"], loadings)
+        predicted_curve = {}
+        predicted_curve['interpolate'] = {}
+        for loading in loadings:
+            predictedParams = scalers[loading].transform(np.array(list(default_curve["parameters_dict"].values())).reshape(1, -1))
+            #print(predictedParams)
+            predicted_curve['interpolate'][loading] = {}
+            predicted_curve['interpolate'][loading]['stress'] = regressors[loading].predictOneDimension(predictedParams).flatten()
+            #print(predicted_curve['interpolate'][loading]['stress'])
+            #time.sleep(60)
+        
+        default_curve["predicted_yielding_loss"] = calculateYieldingLoss(exp_curve["interpolate"], predicted_curve["interpolate"], loadings)
+        default_curve["predicted_hardening_loss"] = calculateHardeningLoss(exp_curve["interpolate"], predicted_curve["interpolate"], loadings)
+        print(default_curve["true_yielding_loss"] )
+        print(default_curve["predicted_yielding_loss"] )
+        print(default_curve["true_hardening_loss"] )
+        print(default_curve["predicted_hardening_loss"] )
+        np.save(f"{iterationResultPath}/common/default_curve.npy", default_curve)
+    else:
+        default_curve = np.load(f"{iterationResultPath}/common/default_curve.npy", allow_pickle=True).tolist()
+        printLog("The file default_curve.npy exists. Loading the default curves\n", logPath)
+
+    printLog(f"The default parameters for the optimization of curve {CPLaw}{curveIndex}\n", logPath)
+    
+    printTupleParametersClean(default_curve["parameters_tuple"], param_info, paramsUnit, CPLaw, logPath)
+    #time.sleep(60)
+    
     trained_models = {
         "regressors": regressors,
         "scalers": scalers,
         "trainingErrors": trainingErrors,
+        'default_curve': default_curve,
     }
 
-    # time.sleep(180)
+    #time.sleep(180)
 
     return trained_models
 

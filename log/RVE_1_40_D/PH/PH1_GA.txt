@@ -3368,3 +3368,3672 @@ This is new parameters. Loss of the best candidate parameters: 0.034172060737016
 #### Stage 1 ####
 Running iteration 1 simulation
 
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         2000         |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+The file default_curves.npy exists. Loading the default curves
+The default parameters for the optimization of curve PH1
+
++------------+----------------+
+| Parameter  |     Value      |
++------------+----------------+
+|    tau0    | 43.10955e6 Pa  |
+|     a      |    6.68635     |
+|     h0     | 976.33817e6 Pa |
+|   tausat   | 360.81991e6 Pa |
+|    self    |    0.32517     |
+|  coplanar  |     0.9835     |
+| collinear  |    8.27915     |
+| orthogonal |    0.89645     |
+|  glissile  |    0.87494     |
+|  sessile   |    0.86294     |
++------------+----------------+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |   2300   |
+|    Epochs of linear_uniaxial_TD    |   2200   |
+|   Epochs of nonlinear_biaxial_RD   |   2600   |
+|   Epochs of nonlinear_biaxial_TD   |   2200   |
+| Epochs of nonlinear_planestrain_RD |   2300   |
+| Epochs of nonlinear_planestrain_TD |   2600   |
+|  Epochs of nonlinear_uniaxial_RD   |   2600   |
+|  Epochs of nonlinear_uniaxial_TD   |   2300   |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 104.28143310546875
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 120.61028289794922
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 214.1905517578125
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 209.14306640625
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 596.8129272460938
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 169.1586456298828
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 138.5245819091797
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 187.7349395751953
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 51.82s
+
+
+**********************************************************************
+
+Step 3: Assessment of the optimization stages of curve PH1
+The yielding parameters are ['tau0']
+The linear hardening parameters are ['a', 'h0', 'tausat']
+The nonlinear hardening parameters are ['self', 'coplanar', 'collinear', 'orthogonal', 'glissile', 'sessile']
+
+There are 1 yielding parameters
+1st stage optimization required
+There are 3 linear hardening parameters
+2nd stage optimization required
+There are 6 small hardening parameters
+3rd stage optimization required
+
+The chosen optimizer is Genetic Algorithm
+Starting the multiple stage optimization for curve PH1
+
+
+**********************************************************************
+
+First optimization stage: Optimize the linear yielding parameters for the curve PH1
+
+#### Stage 1 ####
+Optimizing the parameters tau0
+First optimization stage starts
+
+#### Stage 1 ####
+The loadings not satisfied are
+linear_uniaxial_RD
+linear_uniaxial_TD
+
+#### Stage 1 ####
+#### (Curve PH1) Iteration 1 ####
+Searching time by GA: 17.228393077850342s
+
+
++------------+--------------------+
+| Parameter  |       Value        |
++------------+--------------------+
+|    tau0    | 57.0e6 Pa (target) |
+|     a      |     6.68635        |
+|     h0     |  976.33817e6 Pa    |
+|   tausat   |  360.81991e6 Pa    |
+|    self    |     0.32517        |
+|  coplanar  |      0.9835        |
+| collinear  |     8.27915        |
+| orthogonal |     0.89645        |
+|  glissile  |     0.87494        |
+|  sessile   |     0.86294        |
++------------+--------------------+
+This is new parameters. Loss of the best candidate parameters: 0.2777808119507761
+
+#### Stage 1 ####
+Running iteration 1 simulation
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         2000         |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+The file default_curves.npy exists. Loading the default curves
+The default parameters for the optimization of curve PH1
+
++------------+----------------+
+| Parameter  |     Value      |
++------------+----------------+
+|    tau0    | 43.10955e6 Pa  |
+|     a      |    6.68635     |
+|     h0     | 976.33817e6 Pa |
+|   tausat   | 360.81991e6 Pa |
+|    self    |    0.32517     |
+|  coplanar  |     0.9835     |
+| collinear  |    8.27915     |
+| orthogonal |    0.89645     |
+|  glissile  |    0.87494     |
+|  sessile   |    0.86294     |
++------------+----------------+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |   2300   |
+|    Epochs of linear_uniaxial_TD    |   2200   |
+|   Epochs of nonlinear_biaxial_RD   |   2600   |
+|   Epochs of nonlinear_biaxial_TD   |   2200   |
+| Epochs of nonlinear_planestrain_RD |   2300   |
+| Epochs of nonlinear_planestrain_TD |   2600   |
+|  Epochs of nonlinear_uniaxial_RD   |   2600   |
+|  Epochs of nonlinear_uniaxial_TD   |   2300   |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 106.28227996826172
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 107.80369567871094
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 237.26651000976562
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 357.7666931152344
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 180.1140899658203
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+The default parameters for the optimization of curve PH1
+
++------------+----------------+
+| Parameter  |     Value      |
++------------+----------------+
+|    tau0    | 43.10955e6 Pa  |
+|     a      |    6.68635     |
+|     h0     | 976.33817e6 Pa |
+|   tausat   | 360.81991e6 Pa |
+|    self    |    0.32517     |
+|  coplanar  |     0.9835     |
+| collinear  |    8.27915     |
+| orthogonal |    0.89645     |
+|  glissile  |    0.87494     |
+|  sessile   |    0.86294     |
++------------+----------------+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |   2300   |
+|    Epochs of linear_uniaxial_TD    |   2200   |
+|   Epochs of nonlinear_biaxial_RD   |   2600   |
+|   Epochs of nonlinear_biaxial_TD   |   2200   |
+| Epochs of nonlinear_planestrain_RD |   2300   |
+| Epochs of nonlinear_planestrain_TD |   2600   |
+|  Epochs of nonlinear_uniaxial_RD   |   2600   |
+|  Epochs of nonlinear_uniaxial_TD   |   2300   |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 111.97486877441406
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 95.8442153930664
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 214.78158569335938
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 207.2474365234375
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 215.5648651123047
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 197.99578857421875
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 149.70274353027344
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 191.95126342773438
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 34.53s
+
+
+**********************************************************************
+
+Step 3: Assessment of the optimization stages of curve PH1
+The yielding parameters are ['tau0']
+The linear hardening parameters are ['a', 'h0', 'tausat']
+The nonlinear hardening parameters are ['self', 'coplanar', 'collinear', 'orthogonal', 'glissile', 'sessile']
+
+There are 1 yielding parameters
+1st stage optimization required
+There are 3 linear hardening parameters
+2nd stage optimization required
+There are 6 small hardening parameters
+3rd stage optimization required
+
+The chosen optimizer is Genetic Algorithm
+Starting the multiple stage optimization for curve PH1
+
+
+**********************************************************************
+
+First optimization stage: Optimize the linear yielding parameters for the curve PH1
+
+#### Stage 1 ####
+Optimizing the parameters tau0
+First optimization stage starts
+
+#### Stage 1 ####
+The loadings not satisfied are
+linear_uniaxial_RD
+linear_uniaxial_TD
+
+#### Stage 1 ####
+#### (Curve PH1) Iteration 1 ####
+Searching time by GA: 14.952054500579834s
+
+
++------------+--------------------+
+| Parameter  |       Value        |
++------------+--------------------+
+|    tau0    | 56.6e6 Pa (target) |
+|     a      |     6.68635        |
+|     h0     |  976.33817e6 Pa    |
+|   tausat   |  360.81991e6 Pa    |
+|    self    |     0.32517        |
+|  coplanar  |      0.9835        |
+| collinear  |     8.27915        |
+| orthogonal |     0.89645        |
+|  glissile  |     0.87494        |
+|  sessile   |     0.86294        |
++------------+--------------------+
+This is new parameters. Loss of the best candidate parameters: 0.18910923798740104
+
+#### Stage 1 ####
+Running iteration 1 simulation
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+The file default_curves.npy exists. Loading the default curves
+The default parameters for the optimization of curve PH1
+
++------------+----------------+
+| Parameter  |     Value      |
++------------+----------------+
+|    tau0    | 43.10955e6 Pa  |
+|     a      |    6.68635     |
+|     h0     | 976.33817e6 Pa |
+|   tausat   | 360.81991e6 Pa |
+|    self    |    0.32517     |
+|  coplanar  |     0.9835     |
+| collinear  |    8.27915     |
+| orthogonal |    0.89645     |
+|  glissile  |    0.87494     |
+|  sessile   |    0.86294     |
++------------+----------------+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |   2300   |
+|    Epochs of linear_uniaxial_TD    |   2200   |
+|   Epochs of nonlinear_biaxial_RD   |   2600   |
+|   Epochs of nonlinear_biaxial_TD   |   2200   |
+| Epochs of nonlinear_planestrain_RD |   2300   |
+| Epochs of nonlinear_planestrain_TD |   2600   |
+|  Epochs of nonlinear_uniaxial_RD   |   2600   |
+|  Epochs of nonlinear_uniaxial_TD   |   2300   |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 153.32156372070312
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 128.71983337402344
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 271.0484313964844
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 246.31813049316406
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 243.41041564941406
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 175.17213439941406
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 158.6337127685547
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 160.1412811279297
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 39.76s
+
+
+**********************************************************************
+
+Step 3: Assessment of the optimization stages of curve PH1
+The yielding parameters are ['tau0']
+The linear hardening parameters are ['a', 'h0', 'tausat']
+The nonlinear hardening parameters are ['self', 'coplanar', 'collinear', 'orthogonal', 'glissile', 'sessile']
+
+There are 1 yielding parameters
+1st stage optimization required
+There are 3 linear hardening parameters
+2nd stage optimization required
+There are 6 small hardening parameters
+3rd stage optimization required
+
+The chosen optimizer is Genetic Algorithm
+Starting the multiple stage optimization for curve PH1
+
+
+**********************************************************************
+
+First optimization stage: Optimize the linear yielding parameters for the curve PH1
+
+#### Stage 1 ####
+Optimizing the parameters tau0
+First optimization stage starts
+
+#### Stage 1 ####
+The loadings not satisfied are#### Stage 1 ####
+#### (Curve PH1) Iteration 1 ####
+Searching time by GA: 9.426954507827759s
+
+
++------------+--------------------+
+| Parameter  |       Value        |
++------------+--------------------+
+|    tau0    | 54.2e6 Pa (target) |
+|     a      |     6.68635        |
+|     h0     |  976.33817e6 Pa    |
+|   tausat   |  360.81991e6 Pa    |
+|    self    |     0.32517        |
+|  coplanar  |      0.9835        |
+| collinear  |     8.27915        |
+| orthogonal |     0.89645        |
+|  glissile  |     0.87494        |
+|  sessile   |     0.86294        |
++------------+--------------------+
+This is new parameters. Loss of the best candidate parameters: 0.11948973843934409
+
+#### Stage 1 ####
+Running iteration 1 simulation
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+The file default_curves.npy exists. Loading the default curves
+The default parameters for the optimization of curve PH1
+
++------------+----------------+
+| Parameter  |     Value      |
++------------+----------------+
+|    tau0    | 43.10955e6 Pa  |
+|     a      |    6.68635     |
+|     h0     | 976.33817e6 Pa |
+|   tausat   | 360.81991e6 Pa |
+|    self    |    0.32517     |
+|  coplanar  |     0.9835     |
+| collinear  |    8.27915     |
+| orthogonal |    0.89645     |
+|  glissile  |    0.87494     |
+|  sessile   |    0.86294     |
++------------+----------------+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |   2300   |
+|    Epochs of linear_uniaxial_TD    |   2200   |
+|   Epochs of nonlinear_biaxial_RD   |   2600   |
+|   Epochs of nonlinear_biaxial_TD   |   2200   |
+| Epochs of nonlinear_planestrain_RD |   2300   |
+| Epochs of nonlinear_planestrain_TD |   2600   |
+|  Epochs of nonlinear_uniaxial_RD   |   2600   |
+|  Epochs of nonlinear_uniaxial_TD   |   2300   |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 133.42626953125
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 97.7921142578125
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 234.34898376464844
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 214.8415069580078
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 325.4690246582031
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 178.1988983154297
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 187.00099182128906
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 282.8787536621094
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 35.42s
+
+
+**********************************************************************
+
+Step 3: Assessment of the optimization stages of curve PH1
+The yielding parameters are ['tau0']
+The linear hardening parameters are ['a', 'h0', 'tausat']
+The nonlinear hardening parameters are ['self', 'coplanar', 'collinear', 'orthogonal', 'glissile', 'sessile']
+
+There are 1 yielding parameters
+1st stage optimization required
+There are 3 linear hardening parameters
+2nd stage optimization required
+There are 6 small hardening parameters
+3rd stage optimization required
+
+The chosen optimizer is Genetic Algorithm
+Starting the multiple stage optimization for curve PH1
+
+
+**********************************************************************
+
+First optimization stage: Optimize the linear yielding parameters for the curve PH1
+
+#### Stage 1 ####
+Optimizing the parameters tau0
+First optimization stage starts
+
+#### Stage 1 ####
+The loadings not satisfied are
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+The file default_curves.npy exists. Loading the default curves
+The default parameters for the optimization of curve PH1
+
++------------+----------------+
+| Parameter  |     Value      |
++------------+----------------+
+|    tau0    | 43.10955e6 Pa  |
+|     a      |    6.68635     |
+|     h0     | 976.33817e6 Pa |
+|   tausat   | 360.81991e6 Pa |
+|    self    |    0.32517     |
+|  coplanar  |     0.9835     |
+| collinear  |    8.27915     |
+| orthogonal |    0.89645     |
+|  glissile  |    0.87494     |
+|  sessile   |    0.86294     |
++------------+----------------+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |   2300   |
+|    Epochs of linear_uniaxial_TD    |   2200   |
+|   Epochs of nonlinear_biaxial_RD   |   2600   |
+|   Epochs of nonlinear_biaxial_TD   |   2200   |
+| Epochs of nonlinear_planestrain_RD |   2300   |
+| Epochs of nonlinear_planestrain_TD |   2600   |
+|  Epochs of nonlinear_uniaxial_RD   |   2600   |
+|  Epochs of nonlinear_uniaxial_TD   |   2300   |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 175.78846740722656
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 139.99391174316406
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 194.48818969726562
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 214.89085388183594
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 230.38047790527344
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 223.4318084716797
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 152.36593627929688
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 193.12222290039062
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 43.95s
+
+
+**********************************************************************
+
+Step 3: Assessment of the optimization stages of curve PH1
+The yielding parameters are ['tau0']
+The linear hardening parameters are ['a', 'h0', 'tausat']
+The nonlinear hardening parameters are ['self', 'coplanar', 'collinear', 'orthogonal', 'glissile', 'sessile']
+
+There are 1 yielding parameters
+1st stage optimization required
+There are 3 linear hardening parameters
+2nd stage optimization required
+There are 6 small hardening parameters
+3rd stage optimization required
+
+The chosen optimizer is Genetic Algorithm
+Starting the multiple stage optimization for curve PH1
+
+
+**********************************************************************
+
+First optimization stage: Optimize the linear yielding parameters for the curve PH1
+
+#### Stage 1 ####
+Optimizing the parameters tau0
+First optimization stage starts
+
+#### Stage 1 ####
+The loadings not satisfied are#### Stage 1 ####
+#### (Curve PH1) Iteration 1 ####
+Searching time by GA: 14.75652813911438s
+
+
++------------+--------------------+
+| Parameter  |       Value        |
++------------+--------------------+
+|    tau0    | 56.2e6 Pa (target) |
+|     a      |     6.68635        |
+|     h0     |  976.33817e6 Pa    |
+|   tausat   |  360.81991e6 Pa    |
+|    self    |     0.32517        |
+|  coplanar  |      0.9835        |
+| collinear  |     8.27915        |
+| orthogonal |     0.89645        |
+|  glissile  |     0.87494        |
+|  sessile   |     0.86294        |
++------------+--------------------+
+This is new parameters. Loss of the best candidate parameters: 0.15641612001849706
+
+#### Stage 1 ####
+Running iteration 1 simulation
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |   2300   |
+|    Epochs of linear_uniaxial_TD    |   2200   |
+|   Epochs of nonlinear_biaxial_RD   |   2600   |
+|   Epochs of nonlinear_biaxial_TD   |   2200   |
+| Epochs of nonlinear_planestrain_RD |   2300   |
+| Epochs of nonlinear_planestrain_TD |   2600   |
+|  Epochs of nonlinear_uniaxial_RD   |   2600   |
+|  Epochs of nonlinear_uniaxial_TD   |   2300   |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 101.04460906982422
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 122.86334228515625
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 213.49343872070312
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 250.04708862304688
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 196.28550720214844
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 179.16000366210938
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 120.46148681640625
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 170.99716186523438
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 38.16s
+
+The file default_curves.npy exists. Loading the default curves
+The default parameters for the optimization of curve PH1
+
++------------+----------------+
+| Parameter  |     Value      |
++------------+----------------+
+|    tau0    | 43.10955e6 Pa  |
+|     a      |    6.68635     |
+|     h0     | 976.33817e6 Pa |
+|   tausat   | 360.81991e6 Pa |
+|    self    |    0.32517     |
+|  coplanar  |     0.9835     |
+| collinear  |    8.27915     |
+| orthogonal |    0.89645     |
+|  glissile  |    0.87494     |
+|  sessile   |    0.86294     |
++------------+----------------+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |   2300   |
+|    Epochs of linear_uniaxial_TD    |   2200   |
+|   Epochs of nonlinear_biaxial_RD   |   2600   |
+|   Epochs of nonlinear_biaxial_TD   |   2200   |
+| Epochs of nonlinear_planestrain_RD |   2300   |
+| Epochs of nonlinear_planestrain_TD |   2600   |
+|  Epochs of nonlinear_uniaxial_RD   |   2600   |
+|  Epochs of nonlinear_uniaxial_TD   |   2300   |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 117.88636779785156
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 122.13232421875
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 205.32177734375
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 211.66360473632812
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 162.4505157470703
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 205.9246063232422
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 166.14651489257812
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 445.3984375
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 38.02s
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |   2300   |
+|    Epochs of linear_uniaxial_TD    |   2200   |
+|   Epochs of nonlinear_biaxial_RD   |   2600   |
+|   Epochs of nonlinear_biaxial_TD   |   2200   |
+| Epochs of nonlinear_planestrain_RD |   2300   |
+| Epochs of nonlinear_planestrain_TD |   2600   |
+|  Epochs of nonlinear_uniaxial_RD   |   2600   |
+|  Epochs of nonlinear_uniaxial_TD   |   2300   |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 123.01042938232422
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 111.07530212402344
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 180.53680419921875
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 188.6040802001953
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 129.97206115722656
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 173.07708740234375
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 152.0034637451172
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 228.38352966308594
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 36.65s
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |    10    |
+|    Epochs of linear_uniaxial_TD    |    10    |
+|   Epochs of nonlinear_biaxial_RD   |    10    |
+|   Epochs of nonlinear_biaxial_TD   |    10    |
+| Epochs of nonlinear_planestrain_RD |    10    |
+| Epochs of nonlinear_planestrain_TD |    10    |
+|  Epochs of nonlinear_uniaxial_RD   |    10    |
+|  Epochs of nonlinear_uniaxial_TD   |    10    |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 110082.671875
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 101255.515625
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 248241.453125
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 242015.015625
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 214404.21875
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 290255.28125
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 175821.75
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 235698.390625
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 1.33s
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |    10    |
+|    Epochs of linear_uniaxial_TD    |    10    |
+|   Epochs of nonlinear_biaxial_RD   |    10    |
+|   Epochs of nonlinear_biaxial_TD   |    10    |
+| Epochs of nonlinear_planestrain_RD |    10    |
+| Epochs of nonlinear_planestrain_TD |    10    |
+|  Epochs of nonlinear_uniaxial_RD   |    10    |
+|  Epochs of nonlinear_uniaxial_TD   |    10    |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 109508.6171875
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 100823.203125
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 243981.515625
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 247011.8125
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 219953.046875
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 278081.65625
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 181324.078125
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 255769.84375
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 1.57s
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |    10    |
+|    Epochs of linear_uniaxial_TD    |    10    |
+|   Epochs of nonlinear_biaxial_RD   |    10    |
+|   Epochs of nonlinear_biaxial_TD   |    10    |
+| Epochs of nonlinear_planestrain_RD |    10    |
+| Epochs of nonlinear_planestrain_TD |    10    |
+|  Epochs of nonlinear_uniaxial_RD   |    10    |
+|  Epochs of nonlinear_uniaxial_TD   |    10    |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 99711.890625
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 102341.25
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 240810.921875
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 248695.3125
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 214999.921875
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 293520.875
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 167960.09375
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 243964.546875
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 2.05s
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |    10    |
+|    Epochs of linear_uniaxial_TD    |    10    |
+|   Epochs of nonlinear_biaxial_RD   |    10    |
+|   Epochs of nonlinear_biaxial_TD   |    10    |
+| Epochs of nonlinear_planestrain_RD |    10    |
+| Epochs of nonlinear_planestrain_TD |    10    |
+|  Epochs of nonlinear_uniaxial_RD   |    10    |
+|  Epochs of nonlinear_uniaxial_TD   |    10    |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 101996.265625
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 86714.625
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 246586.609375
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 231307.890625
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 216126.296875
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 272228.125
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 184772.8125
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 239447.015625
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 1.53s
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |    10    |
+|    Epochs of linear_uniaxial_TD    |    10    |
+|   Epochs of nonlinear_biaxial_RD   |    10    |
+|   Epochs of nonlinear_biaxial_TD   |    10    |
+| Epochs of nonlinear_planestrain_RD |    10    |
+| Epochs of nonlinear_planestrain_TD |    10    |
+|  Epochs of nonlinear_uniaxial_RD   |    10    |
+|  Epochs of nonlinear_uniaxial_TD   |    10    |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 92662.1328125
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 91374.4609375
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 258132.171875
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 241618.5
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 213056.578125
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 267289.65625
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 188113.5625
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 240535.78125
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 1.55s
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |    10    |
+|    Epochs of linear_uniaxial_TD    |    10    |
+|   Epochs of nonlinear_biaxial_RD   |    10    |
+|   Epochs of nonlinear_biaxial_TD   |    10    |
+| Epochs of nonlinear_planestrain_RD |    10    |
+| Epochs of nonlinear_planestrain_TD |    10    |
+|  Epochs of nonlinear_uniaxial_RD   |    10    |
+|  Epochs of nonlinear_uniaxial_TD   |    10    |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 81784.8984375
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 111304.5703125
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 250911.84375
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 254954.25
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 211646.953125
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 281038.65625
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 187141.90625
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 258109.640625
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 1.37s
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |    10    |
+|    Epochs of linear_uniaxial_TD    |    10    |
+|   Epochs of nonlinear_biaxial_RD   |    10    |
+|   Epochs of nonlinear_biaxial_TD   |    10    |
+| Epochs of nonlinear_planestrain_RD |    10    |
+| Epochs of nonlinear_planestrain_TD |    10    |
+|  Epochs of nonlinear_uniaxial_RD   |    10    |
+|  Epochs of nonlinear_uniaxial_TD   |    10    |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 108563.0625
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 105266.1796875
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 250527.375
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 257969.8125
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 205926.15625
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 283922.375
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 184956.5625
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 256127.84375
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 1.77s
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |    10    |
+|    Epochs of linear_uniaxial_TD    |    10    |
+|   Epochs of nonlinear_biaxial_RD   |    10    |
+|   Epochs of nonlinear_biaxial_TD   |    10    |
+| Epochs of nonlinear_planestrain_RD |    10    |
+| Epochs of nonlinear_planestrain_TD |    10    |
+|  Epochs of nonlinear_uniaxial_RD   |    10    |
+|  Epochs of nonlinear_uniaxial_TD   |    10    |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 117245.1640625
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 99035.5546875
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 257756.671875
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 250402.15625
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 206270.21875
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 285205.125
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 166525.125
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 252776.125
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 1.69s
+
+The default parameters for the optimization of curve PH1
+
++------------+----------------+
+| Parameter  |     Value      |
++------------+----------------+
+|    tau0    | 43.10955e6 Pa  |
+|     a      |    6.68635     |
+|     h0     | 976.33817e6 Pa |
+|   tausat   | 360.81991e6 Pa |
+|    self    |    0.32517     |
+|  coplanar  |     0.9835     |
+| collinear  |    8.27915     |
+| orthogonal |    0.89645     |
+|  glissile  |    0.87494     |
+|  sessile   |    0.86294     |
++------------+----------------+
+
+**********************************************************************
+
+Step 3: Assessment of the optimization stages of curve PH1
+The yielding parameters are ['tau0']
+The linear hardening parameters are ['a', 'h0', 'tausat']
+The nonlinear hardening parameters are ['self', 'coplanar', 'collinear', 'orthogonal', 'glissile', 'sessile']
+
+There are 1 yielding parameters
+1st stage optimization required
+There are 3 linear hardening parameters
+2nd stage optimization required
+There are 6 small hardening parameters
+3rd stage optimization required
+
+The chosen optimizer is Genetic Algorithm
+Starting the multiple stage optimization for curve PH1
+
+
+**********************************************************************
+
+First optimization stage: Optimize the linear yielding parameters for the curve PH1
+
+#### Stage 1 ####
+Optimizing the parameters tau0
+First optimization stage starts
+
+#### Stage 1 ####
+The loadings not satisfied arelinear_uniaxial_RD: Exp yield: 132.147377437381 MPa | Sim yield: 105.90432580092539linear_uniaxial_TD: Exp yield: 125.56842062723899 MPa | Sim yield: 104.24446273054673
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |    10    |
+|    Epochs of linear_uniaxial_TD    |    10    |
+|   Epochs of nonlinear_biaxial_RD   |    10    |
+|   Epochs of nonlinear_biaxial_TD   |    10    |
+| Epochs of nonlinear_planestrain_RD |    10    |
+| Epochs of nonlinear_planestrain_TD |    10    |
+|  Epochs of nonlinear_uniaxial_RD   |    10    |
+|  Epochs of nonlinear_uniaxial_TD   |    10    |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 107862.953125
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |   2300   |
+|    Epochs of linear_uniaxial_TD    |   2200   |
+|   Epochs of nonlinear_biaxial_RD   |   2600   |
+|   Epochs of nonlinear_biaxial_TD   |   2200   |
+| Epochs of nonlinear_planestrain_RD |   2300   |
+| Epochs of nonlinear_planestrain_TD |   2600   |
+|  Epochs of nonlinear_uniaxial_RD   |   2600   |
+|  Epochs of nonlinear_uniaxial_TD   |   2300   |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 114.35013580322266
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 113.81946563720703
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 229.81341552734375
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 217.1446533203125
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 229.68978881835938
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 300.5926513671875
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 169.40524291992188
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 213.1443328857422
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 38.41s
+
+The default parameters for the optimization of curve PH1
+
++------------+----------------+
+| Parameter  |     Value      |
++------------+----------------+
+|    tau0    | 43.10955e6 Pa  |
+|     a      |    6.68635     |
+|     h0     | 976.33817e6 Pa |
+|   tausat   | 360.81991e6 Pa |
+|    self    |    0.32517     |
+|  coplanar  |     0.9835     |
+| collinear  |    8.27915     |
+| orthogonal |    0.89645     |
+|  glissile  |    0.87494     |
+|  sessile   |    0.86294     |
++------------+----------------+
+
+**********************************************************************
+
+Step 3: Assessment of the optimization stages of curve PH1
+The yielding parameters are ['tau0']
+The linear hardening parameters are ['a', 'h0', 'tausat']
+The nonlinear hardening parameters are ['self', 'coplanar', 'collinear', 'orthogonal', 'glissile', 'sessile']
+
+There are 1 yielding parameters
+1st stage optimization required
+There are 3 linear hardening parameters
+2nd stage optimization required
+There are 6 small hardening parameters
+3rd stage optimization required
+
+The chosen optimizer is Genetic Algorithm
+Starting the multiple stage optimization for curve PH1
+
+
+**********************************************************************
+
+First optimization stage: Optimize the linear yielding parameters for the curve PH1
+
+#### Stage 1 ####
+Optimizing the parameters tau0
+First optimization stage starts
+
+#### Stage 1 ####
+The loadings not satisfied arelinear_uniaxial_RD: Exp yield: 132.147377437381 MPa | Sim yield: 105.90432580092539linear_uniaxial_TD: Exp yield: 125.56842062723899 MPa | Sim yield: 104.24446273054673
+#### Stage 1 ####
+#### (Curve PH1) Iteration 1 ####
+Searching time by GA: 8.91s
+
+The best candidate parameters found by GA
+
++------------+--------------------+
+| Parameter  |       Value        |
++------------+--------------------+
+|    tau0    | 56.3e6 Pa (target) |
+|     a      |     6.68635        |
+|     h0     |  976.33817e6 Pa    |
+|   tausat   |  360.81991e6 Pa    |
+|    self    |     0.32517        |
+|  coplanar  |      0.9835        |
+| collinear  |     8.27915        |
+| orthogonal |     0.89645        |
+|  glissile  |     0.87494        |
+|  sessile   |     0.86294        |
++------------+--------------------+
+This is new parameters. Loss of the best candidate parameters: 0.1603573823079629
+
+#### Stage 1 ####
+Running iteration 1 simulation
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |   2300   |
+|    Epochs of linear_uniaxial_TD    |   2200   |
+|   Epochs of nonlinear_biaxial_RD   |   2600   |
+|   Epochs of nonlinear_biaxial_TD   |   2200   |
+| Epochs of nonlinear_planestrain_RD |   2300   |
+| Epochs of nonlinear_planestrain_TD |   2600   |
+|  Epochs of nonlinear_uniaxial_RD   |   2600   |
+|  Epochs of nonlinear_uniaxial_TD   |   2300   |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 100.91045379638672
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 112.2454833984375
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 314.52459716796875
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 247.51661682128906
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 193.35301208496094
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 205.01950073242188
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 156.29347229003906
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 208.26156616210938
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 41.4s
+
+The file default_curve.npy exists. Loading the default curves
+The default parameters for the optimization of curve PH1
+
++------------+----------------+
+| Parameter  |     Value      |
++------------+----------------+
+|    tau0    | 43.10955e6 Pa  |
+|     a      |    6.68635     |
+|     h0     | 976.33817e6 Pa |
+|   tausat   | 360.81991e6 Pa |
+|    self    |    0.32517     |
+|  coplanar  |     0.9835     |
+| collinear  |    8.27915     |
+| orthogonal |    0.89645     |
+|  glissile  |    0.87494     |
+|  sessile   |    0.86294     |
++------------+----------------+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |   2300   |
+|    Epochs of linear_uniaxial_TD    |   2200   |
+|   Epochs of nonlinear_biaxial_RD   |   2600   |
+|   Epochs of nonlinear_biaxial_TD   |   2200   |
+| Epochs of nonlinear_planestrain_RD |   2300   |
+| Epochs of nonlinear_planestrain_TD |   2600   |
+|  Epochs of nonlinear_uniaxial_RD   |   2600   |
+|  Epochs of nonlinear_uniaxial_TD   |   2300   |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 136.82186889648438
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 142.4036102294922
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 200.74951171875
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 224.88380432128906
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 233.2229766845703
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 170.2042999267578
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 149.43397521972656
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 434.37127685546875
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 43.77s
+
+The default parameters for the optimization of curve PH1
+
++------------+----------------+
+| Parameter  |     Value      |
++------------+----------------+
+|    tau0    | 43.10955e6 Pa  |
+|     a      |    6.68635     |
+|     h0     | 976.33817e6 Pa |
+|   tausat   | 360.81991e6 Pa |
+|    self    |    0.32517     |
+|  coplanar  |     0.9835     |
+| collinear  |    8.27915     |
+| orthogonal |    0.89645     |
+|  glissile  |    0.87494     |
+|  sessile   |    0.86294     |
++------------+----------------+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |   2300   |
+|    Epochs of linear_uniaxial_TD    |   2200   |
+|   Epochs of nonlinear_biaxial_RD   |   2600   |
+|   Epochs of nonlinear_biaxial_TD   |   2200   |
+| Epochs of nonlinear_planestrain_RD |   2300   |
+| Epochs of nonlinear_planestrain_TD |   2600   |
+|  Epochs of nonlinear_uniaxial_RD   |   2600   |
+|  Epochs of nonlinear_uniaxial_TD   |   2300   |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 120.72079467773438
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 110.46664428710938
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 242.35113525390625
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 227.82705688476562
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 219.25111389160156
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 255.37266540527344
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 154.18072509765625
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 203.8915252685547
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 37.86s
+
+The default parameters for the optimization of curve PH1
+
++------------+-----------------+
+| Parameter  |      Value      |
++------------+-----------------+
+|    tau0    |  54.557779e6 Pa |
+|     a      |     4.129065    |
+|     h0     | 106.653327e6 Pa |
+|   tausat   | 590.205103e6 Pa |
+|    self    |     1.726864    |
+|  coplanar  |     1.673837    |
+| collinear  |    23.011506    |
+| orthogonal |     1.547774    |
+|  glissile  |     0.345173    |
+|  sessile   |     1.557779    |
++------------+-----------------+
+
+**********************************************************************
+
+Step 3: Assessment of the optimization stages of curve PH1
+The yielding parameters are ['tau0']
+The linear hardening parameters are ['a', 'h0', 'tausat']
+The nonlinear hardening parameters are ['self', 'coplanar', 'collinear', 'orthogonal', 'glissile', 'sessile']
+
+There are 1 yielding parameters
+1st stage optimization required
+There are 3 linear hardening parameters
+2nd stage optimization required
+There are 6 small hardening parameters
+3rd stage optimization required
+
+The chosen optimizer is Genetic Algorithm
+Starting the multiple stage optimization for curve PH1
+
+
+**********************************************************************
+
+First optimization stage: Optimize the linear yielding parameters for the curve PH1
+
+#### Stage 1 ####
+Optimizing the parameters tau0
+First optimization stage starts
+
+#### Stage 1 ####
+The loadings not satisfied arelinear_uniaxial_RD: Exp yield: 132.147377437381 MPa | Sim yield: 128.18758250006448
+#### Stage 1 ####
+#### (Curve PH1) Iteration 1 ####
+Searching time by GA: 14.66s
+
+The best candidate parameters found by GA
+
++------------+--------------------+
+| Parameter  |       Value        |
++------------+--------------------+
+|    tau0    | 55.8e6 Pa (target) |
+|     a      |     4.129065       |
+|     h0     |  106.653327e6 Pa   |
+|   tausat   |  590.205103e6 Pa   |
+|    self    |     1.726864       |
+|  coplanar  |     1.673837       |
+| collinear  |    23.011506       |
+| orthogonal |     1.547774       |
+|  glissile  |     0.345173       |
+|  sessile   |     1.557779       |
++------------+--------------------+
+This is new parameters. Loss of the best candidate parameters: 0.0003462528072273584
+
+#### Stage 1 ####
+Running iteration 1 simulation
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |   2300   |
+|    Epochs of linear_uniaxial_TD    |   2200   |
+|   Epochs of nonlinear_biaxial_RD   |   2600   |
+|   Epochs of nonlinear_biaxial_TD   |   2200   |
+| Epochs of nonlinear_planestrain_RD |   2300   |
+| Epochs of nonlinear_planestrain_TD |   2600   |
+|  Epochs of nonlinear_uniaxial_RD   |   2600   |
+|  Epochs of nonlinear_uniaxial_TD   |   2300   |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 93.29566955566406
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 123.47766876220703
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 203.4624481201172
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 223.60520935058594
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 204.2034454345703
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 200.84957885742188
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 163.44418334960938
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 216.5846405029297
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 42.14s
+
+The file default_curve.npy exists. Loading the default curves
+The default parameters for the optimization of curve PH1
+
++------------+-----------------+
+| Parameter  |      Value      |
++------------+-----------------+
+|    tau0    |  54.557779e6 Pa |
+|     a      |     4.129065    |
+|     h0     | 106.653327e6 Pa |
+|   tausat   | 590.205103e6 Pa |
+|    self    |     1.726864    |
+|  coplanar  |     1.673837    |
+| collinear  |    23.011506    |
+| orthogonal |     1.547774    |
+|  glissile  |     0.345173    |
+|  sessile   |     1.557779    |
++------------+-----------------+
+
+**********************************************************************
+
+Step 3: Assessment of the optimization stages of curve PH1
+The yielding parameters are ['tau0']
+The linear hardening parameters are ['a', 'h0', 'tausat']
+The nonlinear hardening parameters are ['self', 'coplanar', 'collinear', 'orthogonal', 'glissile', 'sessile']
+
+There are 1 yielding parameters
+1st stage optimization required
+There are 3 linear hardening parameters
+2nd stage optimization required
+There are 6 small hardening parameters
+3rd stage optimization required
+
+The chosen optimizer is Genetic Algorithm
+Starting the multiple stage optimization for curve PH1
+
+
+**********************************************************************
+
+First optimization stage: Optimize the linear yielding parameters for the curve PH1
+
+#### Stage 1 ####
+Optimizing the parameters tau0
+First optimization stage starts
+
+#### Stage 1 ####
+The loadings not satisfied arelinear_uniaxial_RD: Exp yield: 132.147377437381 MPa | Sim yield: 128.18758250006448
+#### Stage 1 ####
+#### (Curve PH1) Iteration 1 ####
+Searching time by GA: 15.37s
+
+The best candidate parameters found by GA
+
++------------+--------------------+
+| Parameter  |       Value        |
++------------+--------------------+
+|    tau0    | 58.3e6 Pa (target) |
+|     a      |     4.129065       |
+|     h0     |  106.653327e6 Pa   |
+|   tausat   |  590.205103e6 Pa   |
+|    self    |     1.726864       |
+|  coplanar  |     1.673837       |
+| collinear  |    23.011506       |
+| orthogonal |     1.547774       |
+|  glissile  |     0.345173       |
+|  sessile   |     1.557779       |
++------------+--------------------+
+This is new parameters. Loss of the best candidate parameters: 0.31407013869364925
+
+#### Stage 1 ####
+Running iteration 1 simulation
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |   2300   |
+|    Epochs of linear_uniaxial_TD    |   2200   |
+|   Epochs of nonlinear_biaxial_RD   |   2600   |
+|   Epochs of nonlinear_biaxial_TD   |   2200   |
+| Epochs of nonlinear_planestrain_RD |   2300   |
+| Epochs of nonlinear_planestrain_TD |   2600   |
+|  Epochs of nonlinear_uniaxial_RD   |   2600   |
+|  Epochs of nonlinear_uniaxial_TD   |   2300   |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 101.58350372314453
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 120.29037475585938
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 339.02386474609375
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 231.6300048828125
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 173.61639404296875
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 160.3081817626953
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 167.18447875976562
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 197.18682861328125
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 38.75s
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |   2300   |
+|    Epochs of linear_uniaxial_TD    |   2200   |
+|   Epochs of nonlinear_biaxial_RD   |   2600   |
+|   Epochs of nonlinear_biaxial_TD   |   2200   |
+| Epochs of nonlinear_planestrain_RD |   2300   |
+| Epochs of nonlinear_planestrain_TD |   2600   |
+|  Epochs of nonlinear_uniaxial_RD   |   2600   |
+|  Epochs of nonlinear_uniaxial_TD   |   2300   |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 130.6874542236328
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 116.58072662353516
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 194.04457092285156
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 256.77960205078125
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 225.90213012695312
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 326.14288330078125
+------------ nonlinear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 20)
+Training MSE error: 142.08547973632812
+------------ nonlinear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 16)
+Training MSE error: 217.6542510986328
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 37.94s
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------------+----------+
+|         ANN configurations         |  Choice  |
++------------------------------------+----------+
+|      Number of hidden layers       |    2     |
+|     Hidden layer nodes formula     | formula1 |
+|           ANN Optimizer            |   Adam   |
+|           Learning rate            |   0.05   |
+|       L2 regularization term       |   0.5    |
+|    Epochs of linear_uniaxial_RD    |   2300   |
+|    Epochs of linear_uniaxial_TD    |   2200   |
+|   Epochs of nonlinear_biaxial_RD   |   2600   |
+|   Epochs of nonlinear_biaxial_TD   |   2200   |
+| Epochs of nonlinear_planestrain_RD |   2300   |
+| Epochs of nonlinear_planestrain_TD |   2600   |
+|  Epochs of nonlinear_uniaxial_RD   |   2600   |
+|  Epochs of nonlinear_uniaxial_TD   |   2300   |
++------------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 123.9808578491211
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 103.8921890258789
+------------ nonlinear_biaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 15)
+Training MSE error: 180.77703857421875
+------------ nonlinear_biaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 17)
+Training MSE error: 207.85874938964844
+------------ nonlinear_planestrain_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 18)
+Training MSE error: 222.64199829101562
+------------ nonlinear_planestrain_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 19)
+Training MSE error: 266.5413818359375
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------+----------+
+|      ANN configurations      |  Choice  |
++------------------------------+----------+
+|   Number of hidden layers    |    2     |
+|  Hidden layer nodes formula  | formula1 |
+|        ANN Optimizer         |   Adam   |
+|        Learning rate         |   0.05   |
+|    L2 regularization term    |   0.5    |
+| Epochs of linear_uniaxial_RD |   2300   |
+| Epochs of linear_uniaxial_TD |   2200   |
++------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 166.09715270996094
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 100.4005355834961
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 9.5s
+
+The default parameters for the optimization of curve PH1
+
++------------+-----------------+
+| Parameter  |      Value      |
++------------+-----------------+
+|    tau0    |  14.538769e6 Pa |
+|     a      |     8.01901     |
+|     h0     | 474.487244e6 Pa |
+|   tausat   | 402.798899e6 Pa |
+|    self    |     1.425713    |
+|  coplanar  |     0.71936     |
+| collinear  |     3.476739    |
+| orthogonal |     0.913457    |
+|  glissile  |     0.300151    |
+|  sessile   |     1.683842    |
++------------+-----------------+
+
+**********************************************************************
+
+Step 3: Assessment of the optimization stages of curve PH1
+The yielding parameters are ['tau0']
+The linear hardening parameters are ['a', 'h0', 'tausat']
+The nonlinear hardening parameters are ['self', 'coplanar', 'collinear', 'orthogonal', 'glissile', 'sessile']
+
+There are 1 yielding parameters
+1st stage optimization required
+There are 3 linear hardening parameters
+2nd stage optimization required
+There are 6 small hardening parameters
+3rd stage optimization required
+
+The chosen optimizer is Genetic Algorithm
+Starting the multiple stage optimization for curve PH1
+
+
+**********************************************************************
+
+First optimization stage: Optimize the linear yielding parameters for the curve PH1
+
+#### Stage 1 ####
+Optimizing the parameters tau0
+First optimization stage starts
+
+#### Stage 1 ####
+The loadings not satisfied arelinear_uniaxial_RD: Exp yield: 132.147377437381 MPa | Sim yield: 43.04650412013778linear_uniaxial_TD: Exp yield: 125.56842062723899 MPa | Sim yield: 42.531461299845354
+#### Stage 1 ####
+#### (Curve PH1) Iteration 1 ####
+Searching time by GA: 10.52s
+
+The best candidate parameters found by GA
+
++------------+--------------------+
+| Parameter  |       Value        |
++------------+--------------------+
+|    tau0    | 55.9e6 Pa (target) |
+|     a      |     8.01901        |
+|     h0     |  474.487244e6 Pa   |
+|   tausat   |  402.798899e6 Pa   |
+|    self    |     1.425713       |
+|  coplanar  |     0.71936        |
+| collinear  |     3.476739       |
+| orthogonal |     0.913457       |
+|  glissile  |     0.300151       |
+|  sessile   |     1.683842       |
++------------+--------------------+
+This is new parameters. Loss of the best candidate parameters: 0.04214819914535339
+
+#### Stage 1 ####
+Running iteration 1 simulation
+
+
+Welcome to the Crystal Plasticity Parameter Calibration software
+
+The configurations you have chosen: 
++---------------------------+----------------------+
+|       Configurations      |     User choice      |
++---------------------------+----------------------+
+|           Server          |        mahti         |
+| Initial simulation number |         500          |
+| Initial simulation method |       manual         |
+|      Searching space      |       discrete       |
+|          Material         |      RVE_1_40_D      |
+|   Crystal plasticity law  | phenomenological law |
+|         Optimizer         |          GA          |
+|   Optimization strategy   |         SOO          |
+|        Target curve       |         PH1          |
+|     Rounding decimals     |          3           |
+|    Linear yielding dev    |         0.5%         |
+|    Linear hardening dev   |          2%          |
+|  Nonlinear hardening dev  |          1%          |
++---------------------------+----------------------+
+Generating necessary directories
+The path to your main project folder is
+C:\Users\nguye\Desktop\Crystal-Plasticity-Journal-Project
+
+**********************************************************************
+
+Step 0: Running initial simulations
+Initial simulations have finished. 500 simulations completed
+
+**********************************************************************
+
+Step 1: Loading progress and preparing data for curve PH1
+
+Finished preparing all target curves
+
+Curve PH1 info: 
++--------------------+-------------------+--------------------------------+
+|      Loading       | Exp yield stress  | Allowed yield stress sim range |
++--------------------+-------------------+--------------------------------+
+| linear_uniaxial_RD |    132.147 MPa    |     [131.487, 132.808 MPa]     |
+| linear_uniaxial_TD |    125.568 MPa    |     [124.941, 126.196 MPa]     |
++--------------------+-------------------+--------------------------------+
+
+Curve PH1 status: 
+0 iteration simulations completed
+500 initial simulations completed
+Total: 500 simulations completed
+Experimental and simulated curves preparation for PH1 has completed
+
+**********************************************************************
+
+Step 2: Train the regressors for all loadings with the initial simulations of curve PH1
+ANN model: (parameters) -> (stress values at interpolating strain points)
+ANN configuration:
++------------------------------+----------+
+|      ANN configurations      |  Choice  |
++------------------------------+----------+
+|   Number of hidden layers    |    2     |
+|  Hidden layer nodes formula  | formula1 |
+|        ANN Optimizer         |   Adam   |
+|        Learning rate         |   0.05   |
+|    L2 regularization term    |   0.5    |
+| Epochs of linear_uniaxial_RD |   2300   |
+| Epochs of linear_uniaxial_TD |   2200   |
++------------------------------+----------+
+------------ linear_uniaxial_RD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 26)
+Training MSE error: 114.39397430419922
+------------ linear_uniaxial_TD ------------
+paramFeatures shape is (500, 10)
+stressLabels shape is (500, 28)
+Training MSE error: 118.94630432128906
+The number of combined interpolate curves is 500
+Finish training ANN for all loadings of curve PH1
+Total training time: 9.52s
+
